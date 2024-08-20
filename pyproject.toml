@@ -1,0 +1,29 @@
+[tool.poetry]
+name = "simplesproject"
+version = "0.1.0"
+description = "MIT"
+authors = ["Edimar Sá <edimar.sa@efscode.com.br>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = {extras = ["standard"], version = "^0.112.0"}
+SQLAlchemy = "^2.0.32"
+python-dotenv = "^1.0.1"
+pydantic = "^2.8.2"
+uvicorn = "^0.30.6"
+psycopg2 = "^2.9.9"
+alembic = "^1.13.2"
+email-validator = "^2.2.0"
+
+[tool.poetry.dev-dependencies]
+pytest = "^8.3.2"
+black = "^24.8.0"
+isort = "^5.13.2"
+
+[tool.poetry.group.dev.dependencies]
+faker = "^27.0.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

@@ -1,0 +1,28 @@
+{"Pt_Br": {
+  "EmailInvalid": "O e-mail deve ter a seguinte estrutura: exemplo@dominio.com",
+  "EmailSame": "O e-mail deve ser differente do anterior.",
+  "PasswordLenght": "A senha deve conter mais de 8 d\u00EDgitos.",
+  "PasswordNeedLowerCase": "A senha deve conter ao menos 1 letra minuscula.",
+  "PasswordNeedNumber": "A senha deve conter ao menos 1 digito num\u00E9rico.",
+  "PasswordNeedSpecial": "A senha deve conter caracteres especiais.",
+  "PasswordNeedUpperCase": "A senha deve conter ao menos 1 letra mai\u00FAscula.",
+  "PasswordSame": "A nova senha deve ser diferente da anterior.",
+  "UserEmailUsed": "E-mail j\u00E1 em uso!",
+  "UserIdExists": "Id de usu\u00E1rio j\u00E1 em uso!",
+  "UserNotFound": "Usu\u00E1rio n\u00E3o encontrado!",
+  "PasswordNull": "Usuário não encontrado!"
+},"En": {
+  "EmailInvalid": "The email must be in the format: example@domain.com",
+  "EmailSame": "The email must be different from the current one.",
+  "PasswordLenght": "The password must be at least 8 characters long.",
+  "PasswordNeedLowerCase": "The password must contain at least one lowercase letter.",
+  "PasswordNeedNumber": "The password must contain at least one number.",
+  "PasswordNeedSpecial": "The password must contain at least one special character.",
+  "PasswordNeedUpperCase": "The password must contain at least one uppercase letter.",
+  "PasswordSame": "The new password cannot be the same as the current one.",
+  "UserEmailUsed": "E-mail in use!",
+  "UserIdExists": "User id already exists!",
+  "UserNotFound": "User does not exist!",
+  "PasswordNull": "User does not exist!"
+
+}}
