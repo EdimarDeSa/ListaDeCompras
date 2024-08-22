@@ -3,7 +3,7 @@
 poetry.lock
 
 # IntelliJ project files
-.idea
+.idea/
 *.iml
 out
 gen
