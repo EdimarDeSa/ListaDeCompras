@@ -10,3 +10,4 @@ class ErrorsDict(dict):
 
 
 MessageType = dict["LanguagesEnum", dict["ExceptionEnum", str]]
+

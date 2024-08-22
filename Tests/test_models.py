@@ -44,7 +44,7 @@ class TestUser:
                 birthdate=fake_data.date_of_birth(maximum_age=80, minimum_age=18),
             )
 
-        assert exec_info.match(MessagesEnum.PASSWORD_LENGHT)
+        assert exec_info.match(MessagesEnum.PASSWORD_LENGTH)
         assert exec_info.errisinstance(ValueError)
 
     def test_create_new_user_fails_in_password_number_digit(self, fake_data):

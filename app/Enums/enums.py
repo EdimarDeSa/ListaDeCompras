@@ -1,5 +1,5 @@
 import json
-from enum import StrEnum
+from enum import StrEnum, IntEnum
 from pathlib import Path
 
 
@@ -8,10 +8,17 @@ class LangEnum(StrEnum):
     EN = "En"
 
 
+class ResponseCode(IntEnum):
+    USER_EMAIL_EXISTS = -2
+    USER_NOT_FOUND = -1
+    OK = 0
+    UNKNOWN_ERROR = -999
+
+
 class MessagesEnum(StrEnum):
     EMAIL_INVALID = "EmailInvalid"
     EMAIL_SAME = "EmailSame"
-    PASSWORD_LENGHT = "PasswordLenght"
+    PASSWORD_LENGTH = "PasswordLenght"
     PASSWORD_NEED_LOWER_CASE = "PasswordNeedLowerCase"
     PASSWORD_NEED_NUMBER = "PasswordNeedNumber"
     PASSWORD_NEED_SPECIAL = "PasswordNeedSpecial"

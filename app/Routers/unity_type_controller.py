@@ -1,17 +1,15 @@
 import uuid
 from typing import Optional
 
-from app.Controllers.base_controller import BaseController
 from app.Enums.enums import LangEnum, HttpMethodsEnum
 from app.Enums.http_exceptions import HttpExceptions
-from app.Models.connection import DBConnectionHandler
 from app.Models.dto_models import UnityTypeDTO
+from app.Routers.base_router import BaseRouter
 
 
-class UnityTypeController(BaseController):
-    def __init__(self, db_conn: DBConnectionHandler) -> None:
+class UnityTypeRouter(BaseRouter):
+    def __init__(self) -> None:
         super().__init__(prefix="/unity_types")
-        self.db_conn = db_conn
         self.__register_routes()
 
     def __register_routes(self) -> None:

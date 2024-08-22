@@ -23,6 +23,7 @@ isort = "^5.13.2"
 
 [tool.poetry.group.dev.dependencies]
 faker = "^27.0.0"
+mypy = "^1.11.1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

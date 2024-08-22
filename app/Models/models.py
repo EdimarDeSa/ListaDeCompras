@@ -31,6 +31,13 @@ class Base(DeclarativeBase):
         return self.name
 
 
+class BaseUserProperty(Base):
+    __abstract__ = True
+
+    name: Mapped[str] = MappedColumn(String(255), nullable=False)
+    user_id: Mapped[uuid.UUID] = MappedColumn(ForeignKey("user.id"), nullable=False)
+
+
 class User(Base):
     __tablename__ = "user"
 
@@ -64,26 +71,21 @@ class DefaultProduct(Base):
     image_url: Mapped[str] = MappedColumn(Text)
 
 
-class Market(Base):
+class Market(BaseUserProperty):
     __tablename__ = "market"
 
-    name: Mapped[str] = MappedColumn(String(255), nullable=False)
-
     __table_args__ = (UniqueConstraint("name", "user_id"),)
 
 
-class UserCategorys(Base):
+class UserCategorys(BaseUserProperty):
     __tablename__ = "user_categorys"
 
-    name: Mapped[str] = MappedColumn(String(255), nullable=False)
-
     __table_args__ = (UniqueConstraint("name", "user_id"),)
 
 
-class UserProducts(Base):
+class UserProducts(BaseUserProperty):
     __tablename__ = "user_products"
 
-    name = MappedColumn(String(255), nullable=False)
     unity_types_id = MappedColumn(UUID, ForeignKey("unity_type.id"), nullable=False)
     price = MappedColumn(Integer, default=0)
     price_unity_types_id = MappedColumn(ForeignKey("unity_type.id"), nullable=False)
@@ -95,10 +97,9 @@ class UserProducts(Base):
     __table_args__ = (UniqueConstraint("name", "user_id"),)
 
 
-class ShoppingList(Base):
+class ShoppingList(BaseUserProperty):
     __tablename__ = "shopping_list"
 
-    name: Mapped[str] = MappedColumn(String(255), nullable=False)
     final_value: Mapped[int] = MappedColumn(Integer, default=0)
     unique_items: Mapped[int] = MappedColumn(Integer, default=0)
     total_items: Mapped[int] = MappedColumn(Integer, default=0)
@@ -106,12 +107,12 @@ class ShoppingList(Base):
     __table_args__ = (UniqueConstraint("name", "user_id"),)
 
 
-class ShoppingLog(Base):
+class ShoppingLog(BaseUserProperty):
     __tablename__ = "shopping_log"
 
-    shopping_list_id = MappedColumn(ForeignKey("shopping_list.id"), nullable=False)
-    market_id = MappedColumn(ForeignKey("markets.id"), nullable=False)
-    buy_date = MappedColumn(DateTime, nullable=False)
+    shopping_list_id: Mapped[uuid.UUID] = MappedColumn(ForeignKey("shopping_list.id"), nullable=False)
+    market_id: Mapped[uuid.UUID] = MappedColumn(ForeignKey("markets.id"), nullable=False)
+    buy_date: Mapped[date] = MappedColumn(DateTime, nullable=False)
 
     def __str__(self):
         return f"{self.market_id.name} - {self.shopping_list_id.name}"

@@ -1,27 +1,21 @@
 import re
 import uuid
-from datetime import date, datetime
-from typing import Optional
+from datetime import date
 
-from pydantic import BaseModel, EmailStr, Field, model_validator
+from pydantic import EmailStr, Field, model_validator
 from typing_extensions import Self
 
 from app.Enums.enums import LangEnum, MessagesEnum
+from app.Schemas.requests.base_request import BaseRequest
 from app.Utils.types import ErrorsDict
-from app.Utils.utils import datetime_now_utc
 
 
-class BaseDTO(BaseModel):
-    id: Optional[uuid.UUID] = Field(default_factory=uuid.uuid4, frozen=True)
-    name: str = Field(max_length=100)
-    creation: datetime = Field(default_factory=datetime_now_utc, frozen=True)
-    last_update: datetime = Field(
-        default_factory=datetime_now_utc,
-        frozen=True,
-    )
+class BaseUserPropertyDTO(BaseRequest):
+    name: str = Field(max_length=255)
+    user_id: uuid.UUID
 
 
-class UserDTO(BaseDTO):
+class UserDTO(BaseRequest):
     email: EmailStr = Field(
         examples=[
             "your.email@domain.com",
@@ -31,16 +25,8 @@ class UserDTO(BaseDTO):
     birthdate: date
 
 
-class NewUser(BaseDTO):
-    name: str = Field(max_length=100)
-    email: EmailStr = Field(
-        examples=[
-            "your.email@domain.com",
-        ]
-    )
-    language: LangEnum = Field(default=LangEnum.PT_BR)
+class NewUser(UserDTO):
     password: str = Field(max_length=255, examples=["P@s5W0rD"])
-    birthdate: date
 
     @model_validator(mode="after")
     def validate_password(self) -> Self:
@@ -52,7 +38,7 @@ class NewUser(BaseDTO):
             raise ValueError(errors)
 
         if len(self.password) < 8:
-            errors.insert(MessagesEnum.PASSWORD_LENGHT, self.language)
+            errors.insert(MessagesEnum.PASSWORD_LENGTH, self.language)
 
         if not re.search(r"\d", self.password):
             errors.insert(MessagesEnum.PASSWORD_NEED_NUMBER, self.language)
@@ -72,15 +58,54 @@ class NewUser(BaseDTO):
         return self
 
 
-class DefaultCategoryDTO(BaseDTO):
+class DefaultCategoryDTO(BaseRequest):
     pass
 
 
-class UnityTypeDTO(BaseDTO):
+class UnityTypeDTO(BaseRequest):
     base_calc: int = 1
 
 
-class DefaultProductDTO(BaseDTO):
+class DefaultProductDTO(BaseRequest):
     unit_type_id: uuid.UUID
     category_id: uuid.UUID
     image_url: str
+
+
+class MarketDTO(BaseUserPropertyDTO):
+    pass
+
+
+class UserCategorysDTO(BaseUserPropertyDTO):
+    pass
+
+
+class UserProductsDTO(BaseUserPropertyDTO):
+    unity_types_id: uuid.UUID
+    price: float
+    price_unity_types_id: uuid.UUID
+    category_id: uuid.UUID
+    notes: str
+    barcode: str
+    image_url: str
+
+
+class ShoppingListDTO(BaseUserPropertyDTO):
+    final_value: float
+    unique_items: int
+    total_items: int
+
+
+class ShoppingLogDTO(BaseUserPropertyDTO):
+    shopping_list_id: uuid.UUID
+    market_id: uuid.UUID
+    buy_date: date
+
+
+class ProductListDTO(BaseRequest):
+    shopping_list_id: uuid.UUID
+    user_product_id: uuid.UUID
+    quantity: int
+    price: float
+    total: float = 0
+    on_cart: bool = False

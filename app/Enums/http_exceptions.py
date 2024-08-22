@@ -1,27 +1,38 @@
 from abc import ABC
 
-from fastapi import HTTPException
 from starlette.status import *
 
-from app.Enums.enums import LangEnum, MsgLoader, MessagesEnum
+from app.Enums.enums import LangEnum, MsgLoader, MessagesEnum, ResponseCode
 
 
-class CustomHttpException(ABC, HTTPException):
-    def __init__(self, status_code: int, error_code: MessagesEnum, lang: LangEnum) -> None:
-        message = MsgLoader.get_message(error_code, lang)
-        super().__init__(status_code=status_code, detail=message)
+class BaseInternalException(ABC, Exception):
+    def __init__(self, status_code: int, error_message: MessagesEnum, lang: LangEnum, rc: ResponseCode) -> None:
+        super().__init__()
+        self.message: str = MsgLoader.get_message(error_message, lang)
+        self.status_code: int = status_code
+        self.rc: ResponseCode = rc
 
 
-class UserNotFound(CustomHttpException):
+class UserNotFound(BaseInternalException):
     def __init__(self, lang: LangEnum = LangEnum.PT_BR) -> None:
-        super().__init__(status_code=HTTP_404_NOT_FOUND, error_code=MessagesEnum.USER_NOT_FOUND, lang=lang)
+        super().__init__(
+            status_code=HTTP_404_NOT_FOUND,
+            error_message=MessagesEnum.USER_NOT_FOUND,
+            lang=lang,
+            rc=ResponseCode.USER_NOT_FOUND,
+        )
 
 
-class UserEmailUsed(CustomHttpException):
+class UserEmailUsed(BaseInternalException):
     def __init__(self, lang: LangEnum = LangEnum.PT_BR) -> None:
-        super().__init__(status_code=HTTP_400_BAD_REQUEST, error_code=MessagesEnum.USER_EMAIL_USED, lang=lang)
+        super().__init__(
+            status_code=HTTP_400_BAD_REQUEST,
+            error_message=MessagesEnum.USER_EMAIL_USED,
+            lang=lang,
+            rc=ResponseCode.USER_EMAIL_EXISTS,
+        )
 
 
-class HttpExceptions:
+class InternalExceptions:
     UserNotFound: type[UserNotFound] = UserNotFound
     UserEmailUsed: type[UserEmailUsed] = UserEmailUsed
