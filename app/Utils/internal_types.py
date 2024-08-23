@@ -1,4 +1,5 @@
-from app.Enums.enums import MessagesEnum, LangEnum, MsgLoader
+from app.Enums.enums import MessagesEnum, LangEnum
+from app.Utils.global_functions import MsgLoader
 
 
 class ErrorsDict(dict):
@@ -10,4 +11,3 @@ class ErrorsDict(dict):
 
 
 MessageType = dict["LanguagesEnum", dict["ExceptionEnum", str]]
-

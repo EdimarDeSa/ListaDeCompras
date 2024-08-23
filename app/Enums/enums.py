@@ -1,6 +1,4 @@
-import json
 from enum import StrEnum, IntEnum
-from pathlib import Path
 
 
 class LangEnum(StrEnum):
@@ -28,15 +26,6 @@ class MessagesEnum(StrEnum):
     USER_EMAIL_USED = "UserEmailUsed"
     USER_ID_EXISTS = "UserIdExists"
     USER_NOT_FOUND = "UserNotFound"
-
-
-class MsgLoader:
-    with open(Path(__file__).resolve().parent.parent.parent / "./messages.json", "r") as file:
-        __messages = json.load(file)
-
-    @classmethod
-    def get_message(cls, error_code: MessagesEnum, language: LangEnum = LangEnum.PT_BR) -> str:
-        return cls.__messages[language.value][error_code.value]
 
 
 class HttpMethodsEnum(StrEnum):

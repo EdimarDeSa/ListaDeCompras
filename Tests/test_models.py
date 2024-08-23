@@ -1,11 +1,19 @@
+from typing import Any
+
 from faker import Faker
 from fastapi.testclient import TestClient
+from mypy.build import TypedDict
 from pydantic import ValidationError
 from pytest import raises, fixture
 
 from app.Enums.enums import MessagesEnum, LangEnum
 from app.Models.dto_models import NewUser, UserDTO
 from main import app
+
+
+class ReturnType(TypedDict):
+    data: list[dict[str, Any]]
+    rc: int
 
 
 class TestUser:
@@ -173,21 +181,31 @@ class TestUserController:
 
     @fixture
     def moc_user(self, client):
-        response1 = client.get("/users/all")
-        data: dict = response1.json()[0]
+        response = client.get("/users/all")
+        data = self.get_return_type(response)["data"][0]
+
         return UserDTO(**data)
 
     def test_get_all_users(self, client):
         response = client.get("/users/all")
 
-        assert response.status_code == 200
-        assert isinstance(response.json(), list)
+        data = self.get_return_type(response)
 
-    def test_get_user_by_id_seccess(self, client, moc_user):
+        assert response.status_code == 200
+        assert data["rc"] == 0
+        assert len(data["data"]) > 0
+
+    def test_get_user_by_id_success(self, client, moc_user):
         response = client.get(f"/users/{moc_user.id}")
 
+        data = self.get_return_type(response)
+
         assert response.status_code == 200
-        assert response.json()["name"] == moc_user.name
+        assert data["data"]["name"] == moc_user.name
+
+    @staticmethod
+    def get_return_type(response) -> ReturnType:
+        return response.json()
 
     # def test_put_user_new_email_success(self, client, moc_user, fake_data):
     #     last_email = moc_user.email

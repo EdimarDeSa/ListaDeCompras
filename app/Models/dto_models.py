@@ -7,7 +7,7 @@ from typing_extensions import Self
 
 from app.Enums.enums import LangEnum, MessagesEnum
 from app.Schemas.requests.base_request import BaseRequest
-from app.Utils.types import ErrorsDict
+from app.Utils.internal_types import ErrorsDict
 
 
 class BaseUserPropertyDTO(BaseRequest):

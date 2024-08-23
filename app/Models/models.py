@@ -5,7 +5,7 @@ from sqlalchemy import String, Integer, ForeignKey, UniqueConstraint, UUID, Date
 from sqlalchemy.orm import DeclarativeBase, Mapped, registry, MappedColumn
 
 from app.Enums.enums import LangEnum
-from app.Utils.utils import datetime_now_utc
+from app.Utils.global_functions import datetime_now_utc
 
 reg = registry()
 

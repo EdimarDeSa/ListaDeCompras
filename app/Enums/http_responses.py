@@ -1,19 +1,17 @@
-from abc import ABC
-
-from fastapi import Response
 from starlette.status import *
 
-from app.Enums.enums import LangEnum, MessagesEnum, MsgLoader
+from app.Enums.base_http_response import BaseHttpResponse
+from app.Enums.enums import LangEnum
 
 
-class CustomHttpException(ABC, Response):
-    def __init__(self, status_code: int, msg: MessagesEnum, lang: LangEnum) -> None:
-        message = MsgLoader.get_message(msg, lang)
-        super().__init__(status_code=status_code, content=message)
+class HttpResponses:
+    Ok = Ok
+    NoContent = NoContent
+    Created = Created
 
 
 # TODO: Criar as mensagens deste response, adicionar o texto ao app.Enums.enums.MessagesEnum
-class Ok(CustomHttpException):
+class Ok(BaseHttpResponse):
     """:type: fastapi.Response(status_code: 200)"""
 
     def __init__(self, lang: LangEnum = LangEnum.PT_BR) -> None:
@@ -21,7 +19,7 @@ class Ok(CustomHttpException):
 
 
 # TODO: Criar as mensagens deste response, adicionar o texto ao app.Enums.enums.MessagesEnum
-class Created(CustomHttpException):
+class Created(BaseHttpResponse):
     """:type: fastapi.Response(status_code: 201)"""
 
     def __init__(self, lang: LangEnum = LangEnum.PT_BR) -> None:
@@ -29,14 +27,8 @@ class Created(CustomHttpException):
 
 
 # TODO: Criar as mensagens deste response, adicionar o texto ao app.Enums.enums.MessagesEnum
-class NoContent(CustomHttpException):
+class NoContent(BaseHttpResponse):
     """:type: fastapi.Response(status_code: 204)"""
 
     def __init__(self, lang: LangEnum = LangEnum.PT_BR) -> None:
         super().__init__(status_code=HTTP_204_NO_CONTENT, msg="", lang=lang)
-
-
-class HttpResponses:
-    Ok: type[Ok] = Ok
-    NoContent: type[NoContent] = NoContent
-    Created: type[Created] = Created

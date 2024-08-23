@@ -14,16 +14,25 @@ python-dotenv = "^1.0.1"
 pydantic = "^2.8.2"
 uvicorn = "^0.30.6"
 psycopg2 = "^2.9.9"
-alembic = "^1.13.2"
 email-validator = "^2.2.0"
+black = "^24.8.0"
 
 [tool.poetry.group.dev.dependencies]
 faker = "^27.0.0"
-mypy = "^1.11.1"
 pytest = "^8.3.2"
-black = "^24.8.0"
-isort = "^5.13.2"
+mypy = "^1.11.1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 120
+
+[tool.mypy]
+python_version = 3.12
+warn_return_any = true
+warn_unused_configs = true
+warn_redundant_casts = true
+ignore_missing_imports = true
+show_absolute_path = true

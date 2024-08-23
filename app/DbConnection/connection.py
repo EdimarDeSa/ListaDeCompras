@@ -1,15 +1,8 @@
-import time
-import uuid
 from os import getenv
-from typing import Optional
+from typing import Any
 
-import sqlalchemy as sa
-from sqlalchemy import Engine, create_engine
-from sqlalchemy.exc import OperationalError
+from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker, scoped_session
-
-from app.Models.dto_models import UserDTO, NewUser, UnityTypeDTO, DefaultCategoryDTO
-from app.Models.models import User, UnityType, DefaultCategory
 
 
 def get_db_url() -> str:
@@ -25,7 +18,7 @@ def get_db_url() -> str:
 
 class DBConnectionHandler:
     @staticmethod
-    def create_session(*, write=False, db_url: str) -> Session:
+    def create_session(*, write=False, db_url: str) -> scoped_session[Session | Any]:
         engine = create_engine(
             db_url, pool_size=250, max_overflow=50, pool_use_lifo=True, pool_pre_ping=True, pool_recycle=300
         )
@@ -42,14 +35,6 @@ class DBConnectionHandler:
     #         session.add(user)
     #         session.commit()
     #
-    # def read_user_by_id(self, id_: uuid.UUID) -> Optional[UserDTO]:
-    #     with Session(self.__engine) as session:
-    #         query = sa.select(User).where(User.id == id_)
-    #         row = session.execute(query).first()
-    #     if row is None:
-    #         return None
-    #     return self.__user_to_dto(row.User)
-    #
     # def read_unity_type_by_id(self, id_: uuid.UUID) -> Optional[UnityTypeDTO]:
     #     with Session(self.__engine) as session:
     #         query = sa.select(UnityType).where(UnityType.id == id_)
@@ -65,13 +50,6 @@ class DBConnectionHandler:
     #     if row is None:
     #         return None
     #     return self.__unity_type_to_dto(row.UnityType)
-    #
-    # def read_all_users(self) -> list[UserDTO]:
-    #     with Session(self.__engine) as session:
-    #         query = sa.select(User).order_by(User.name)
-    #         rows = session.execute(query).all()
-    #
-    #     return [self.__user_to_dto(row.User) for row in rows]
     #
     # def read_all_unity_types(self) -> list[UnityTypeDTO]:
     #     with Session(self.__engine) as session:

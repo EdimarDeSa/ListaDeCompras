@@ -1,6 +1,5 @@
 from typing import Optional, Mapping, Any
 
-import fastapi
 from fastapi import Response
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
@@ -16,7 +15,7 @@ class BaseResponse(Response):
     def __init__(
         self,
         *,
-        status_code: fastapi.status,
+        status_code: int,
         content: BaseContent,
         headers: Optional[Mapping[str, str]] = None,
         media_type: Optional[str] = "application/json",

@@ -4,7 +4,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field, ConfigDict
 
-from app.Utils.utils import datetime_now_utc
+from app.Utils.global_functions import datetime_now_utc
 
 
 class BaseRequest(BaseModel):

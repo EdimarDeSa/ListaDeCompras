@@ -33,16 +33,19 @@ class UserRouter(BaseRouter):
         service = self.create_service()
 
         try:
+
             users = service.read_all(language)
 
             content = BaseContent(rc=ResponseCode.OK, data=users)
             return BaseResponse(status_code=st.HTTP_200_OK, content=content)
 
-        except:
+        except Exception as _:
+
             content = BaseContent(rc=ResponseCode.UNKNOWN_ERROR)
             return BaseResponse(status_code=st.HTTP_500_INTERNAL_SERVER_ERROR, content=content)
 
     async def get_user_by_id(self, user_id: UUID, language: Optional[LangEnum] = None) -> BaseResponse:
+
         service = self.create_service()
 
         try:

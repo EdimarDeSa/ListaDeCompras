@@ -2,7 +2,8 @@ from abc import ABC
 
 from starlette.status import *
 
-from app.Enums.enums import LangEnum, MsgLoader, MessagesEnum, ResponseCode
+from app.Enums.enums import LangEnum, MessagesEnum, ResponseCode
+from app.Utils.global_functions import MsgLoader
 
 
 class BaseInternalException(ABC, Exception):
@@ -34,5 +35,5 @@ class UserEmailUsed(BaseInternalException):
 
 
 class InternalExceptions:
-    UserNotFound: type[UserNotFound] = UserNotFound
-    UserEmailUsed: type[UserEmailUsed] = UserEmailUsed
+    UserNotFound = UserNotFound
+    UserEmailUsed = UserEmailUsed
