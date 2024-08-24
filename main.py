@@ -8,7 +8,7 @@ from app.Routers.user_controller import UserRouter
 
 load_dotenv()
 
-controllers: list[type[BaseRouter]] = [
+routers: list[type[BaseRouter]] = [
     UserRouter,
     # UnityTypeRouter,
     # DefaultCategoryRouter,
@@ -18,8 +18,8 @@ DEBUG: bool = bool(int(getenv("DEBUG", "0")))
 
 app = FastAPI(title="Lista de compras", debug=DEBUG)
 
-for controller in controllers:
-    app.include_router(controller())
+for router in routers:
+    app.include_router(router())
 
 
 if __name__ == "__main__":
