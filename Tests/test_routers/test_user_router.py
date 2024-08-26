@@ -190,3 +190,24 @@ def test_put_user_new_email_success(client, moc_user, fake_data):
 
     assert response.status_code == 202
     assert json_data["rc"] == ResponseCode.OK
+
+
+def test_delete_user_by_email_success(client, moc_user):
+    user_email = moc_user.email
+
+    response = client.delete(f"/users/{user_email}")
+
+    json_data = response.json()
+
+    assert response.status_code == 202
+    assert json_data["rc"] == ResponseCode.OK
+
+def test_delete_user_by_email_fail(client, moc_user, fake_data):
+    user_email = fake_data.email()
+
+    response = client.delete(f"/users/{user_email}")
+
+    json_data = response.json()
+
+    assert response.status_code == 404
+    assert json_data["rc"] == ResponseCode.USER_NOT_FOUND
