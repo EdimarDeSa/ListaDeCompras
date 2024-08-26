@@ -3,6 +3,8 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Optional
 
+from app.Enums.enums import ResponseCode, LangEnum
+
 
 def datetime_now_utc() -> datetime:
     return datetime.now(UTC)
@@ -18,6 +20,8 @@ class MsgLoader:
                 cls.__messages = json.load(file)
 
     @classmethod
-    def get_message(cls, message_name: str, language: str = "Pt_Br") -> str:
+    def get_message(cls, rc: ResponseCode, language: str = LangEnum.EN) -> str:
         cls._load_messages()
-        return cls.__messages[language][message_name]
+        language_dict = cls.__messages.get(language, {})
+        message = language_dict.get(rc.name, rc.name)
+        return message
