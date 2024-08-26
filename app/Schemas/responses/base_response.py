@@ -8,7 +8,7 @@ from starlette.background import BackgroundTask
 
 class BaseContent(BaseModel):
     rc: int = 0
-    data: Any
+    data: Any = None
 
 
 class BaseResponse(Response):
