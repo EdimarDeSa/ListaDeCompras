@@ -1,61 +1,45 @@
-import re
 import uuid
-from datetime import date
+from datetime import date, datetime
+from typing import Optional
 
-from pydantic import EmailStr, Field, model_validator
-from typing_extensions import Self
+from pydantic import Field, BaseModel
 
-from app.Enums.enums import LangEnum, MessagesEnum
+from app.Enums.enums import LangEnum
 from app.Schemas.requests.base_request import BaseRequest
-from app.Utils.internal_types import ErrorsDict
+from app.Utils.global_functions import datetime_now_utc
 
 
 class BaseUserPropertyDTO(BaseRequest):
-    name: str = Field(max_length=255)
     user_id: uuid.UUID
 
 
 class UserDTO(BaseRequest):
-    email: EmailStr = Field(
-        examples=[
-            "your.email@domain.com",
-        ]
-    )
-    language: LangEnum = Field(default=LangEnum.PT_BR)
+    email: str = Field(examples=["your.email@domain.com"])
+    language: LangEnum = LangEnum.EN
     birthdate: date
+
+    def __eq__(self, other) -> bool:
+        return all(
+            [
+                self.id == other.id,
+                self.name == other.name,
+                self.email == other.email,
+                self.birthdate == other.birthdate,
+            ]
+        )
+
+
+class UpdateUserDTO(BaseModel):
+    id: uuid.UUID
+    name: Optional[str] = None
+    email: Optional[str] = Field(default=None, examples=["your.email@domain.com"])
+    language: Optional[LangEnum] = None
+    birthdate: Optional[date] = None
+    last_update: Optional[datetime] = Field(default_factory=datetime_now_utc, frozen=True)
 
 
 class NewUser(UserDTO):
-    password: str = Field(max_length=255, examples=["P@s5W0rD"])
-
-    @model_validator(mode="after")
-    def validate_password(self) -> Self:
-
-        errors: ErrorsDict = ErrorsDict()
-
-        if not self.password:
-            errors.insert(MessagesEnum.PASSWORD_NULL, self.language)
-            raise ValueError(errors)
-
-        if len(self.password) < 8:
-            errors.insert(MessagesEnum.PASSWORD_LENGTH, self.language)
-
-        if not re.search(r"\d", self.password):
-            errors.insert(MessagesEnum.PASSWORD_NEED_NUMBER, self.language)
-
-        if not re.search(r"[A-Z]", self.password):
-            errors.insert(MessagesEnum.PASSWORD_NEED_UPPER_CASE, self.language)
-
-        if not re.search(r"[a-z]", self.password):
-            errors.insert(MessagesEnum.PASSWORD_NEED_LOWER_CASE, self.language)
-
-        if not re.search(r"[\W_]", self.password):
-            errors.insert(MessagesEnum.PASSWORD_NEED_SPECIAL, self.language)
-
-        if errors:
-            raise ValueError(errors)
-
-        return self
+    password: str = Field(examples=["P@s5W0rD"])
 
 
 class DefaultCategoryDTO(BaseRequest):
