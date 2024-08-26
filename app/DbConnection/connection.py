@@ -28,13 +28,6 @@ class DBConnectionHandler:
 
         return scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
 
-    # def create_user(self, new_user: NewUser) -> None:
-    #     with Session(self.__engine) as session:
-    #         user = User(**new_user.model_dump())
-    #
-    #         session.add(user)
-    #         session.commit()
-    #
     # def read_unity_type_by_id(self, id_: uuid.UUID) -> Optional[UnityTypeDTO]:
     #     with Session(self.__engine) as session:
     #         query = sa.select(UnityType).where(UnityType.id == id_)
@@ -42,7 +35,7 @@ class DBConnectionHandler:
     #     if row is None:
     #         return None
     #     return self.__unity_type_to_dto(row.UnityType)
-    #
+    #|
     # def read_unity_type_by_name(self, name: str) -> Optional[UnityTypeDTO]:
     #     with Session(self.__engine) as session:
     #         query = sa.select(UnityType).where(UnityType.name == name)
@@ -64,12 +57,6 @@ class DBConnectionHandler:
     #         rows = session.execute(query).all()
     #
     #     return [self.__default_category_to_dto(row.DefaultCategory) for row in rows]
-    #
-    # def update_user(self, user_dto: UserDTO) -> None:
-    #     with Session(self.__engine) as session:
-    #         query = sa.update(User).where(User.id == user_dto.id).values(**user_dto.model_dump())
-    #         session.execute(query)
-    #         session.commit()
     #
     # def delete_user_by_email(self, email: str) -> Optional[bool]:
     #     with Session(self.__engine) as session:
