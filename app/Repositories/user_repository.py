@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session, scoped_session
 from app.Enums.base_internal_exception import BaseInternalException
 from app.Enums.enums import LangEnum, ResponseCode
 from app.Models.dto_models import UserDTO, NewUser, UpdateUserDTO
+from app.Models.models import User
 from app.Querys.user_querys import UserQuery
 from app.Repositories.base_repository import BaseRepository
 
@@ -95,6 +96,31 @@ class UserRepository(BaseRepository):
             self.db_session.flush()
 
             return UpdateUserDTO.model_validate(cleaned_data)
+
+        except Exception as e:
+            raise e
+
+    def delete_user_by_email(self, db_session: scoped_session[Session], _query: UserQuery, user_email: str) -> None:
+        self.db_session = db_session
+
+        try:
+
+            query = _query.select_user_by_email(user_email)
+
+            result = self.db_session.execute(query).first()
+
+            if result is None:
+                raise BaseInternalException(
+                    rc=ResponseCode.USER_NOT_FOUND,
+                    language=LangEnum.EN,
+                    status_code=st.HTTP_404_NOT_FOUND,
+                )
+
+            user: User = result[0]
+
+            query = _query.delete_user_by_id(user.id)
+
+            self.db_session.execute(query)
 
         except Exception as e:
             raise e

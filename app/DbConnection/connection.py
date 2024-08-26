@@ -35,7 +35,7 @@ class DBConnectionHandler:
     #     if row is None:
     #         return None
     #     return self.__unity_type_to_dto(row.UnityType)
-    #|
+    # |
     # def read_unity_type_by_name(self, name: str) -> Optional[UnityTypeDTO]:
     #     with Session(self.__engine) as session:
     #         query = sa.select(UnityType).where(UnityType.name == name)
@@ -57,20 +57,7 @@ class DBConnectionHandler:
     #         rows = session.execute(query).all()
     #
     #     return [self.__default_category_to_dto(row.DefaultCategory) for row in rows]
-    #
-    # def delete_user_by_email(self, email: str) -> Optional[bool]:
-    #     with Session(self.__engine) as session:
-    #         query_read = sa.select(User).where(User.email == email)
-    #         row = session.execute(query_read).first()
-    #
-    #         if row is None:
-    #             return None
-    #
-    #         query_delete = sa.delete(User).where(User.email == email)
-    #         session.execute(query_delete)
-    #
-    #         session.commit()
-    #     return True
+
     #
     # def __test_connection(self) -> None:
     #     retries, max_retries = 0, 5
@@ -84,38 +71,3 @@ class DBConnectionHandler:
     #             print(f"Retrying ({retries}/{max_retries}) due to error: {e}")
     #             time.sleep(5)
     #     raise Exception("Database connection error after multiple retries.")
-    #
-    # @staticmethod
-    # def __create_engine(url: str) -> Engine:
-    #     return sa.create_engine(url=url)
-    #
-    # @staticmethod
-    # def __user_to_dto(user: User) -> UserDTO:
-    #     return UserDTO(
-    #         id=user.id,
-    #         name=user.name,
-    #         email=user.email,
-    #         birthdate=user.birthdate,
-    #         language=user.language,
-    #         creation=user.creation,
-    #         last_update=user.last_update,
-    #     )
-    #
-    # @staticmethod
-    # def __unity_type_to_dto(unity_type: UnityType) -> UnityTypeDTO:
-    #     return UnityTypeDTO(
-    #         id=unity_type.id,
-    #         name=unity_type.name,
-    #         creation=unity_type.creation,
-    #         last_update=unity_type.last_update,
-    #         base_calc=unity_type.base_calc,
-    #     )
-    #
-    # @staticmethod
-    # def __default_category_to_dto(unity_type: UnityType) -> DefaultCategoryDTO:
-    #     return DefaultCategoryDTO(
-    #         id=unity_type.id,
-    #         name=unity_type.name,
-    #         creation=unity_type.creation,
-    #         last_update=unity_type.last_update,
-    #     )

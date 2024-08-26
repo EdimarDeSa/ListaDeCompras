@@ -104,6 +104,25 @@ class UserService(BaseService):
         finally:
             db_session.close()
 
+    def delete_user_by_email(self, user_email: str) -> None:
+        db_session = self._create_db_session()
+
+        try:
+
+            self._repository.delete_user_by_email(db_session, self._query, user_email)
+
+            db_session.commit()
+
+        except Exception as e:
+            db_session.rollback()
+
+            self._logger.exception(e)
+
+            raise e
+
+        finally:
+            db_session.close()
+
     def _create_repository(self) -> UserRepository:
         return UserRepository()
 
@@ -113,9 +132,9 @@ class UserService(BaseService):
     def _create_logger(self) -> Logger:
         return Logger(__name__)
 
-    def _create_db_session(self) -> scoped_session[Session]:
-        return DBConnectionHandler.create_session(db_url=get_db_url())
-
     @staticmethod
     def _create_query():
         return UserQuery()
+
+    def _create_db_session(self) -> scoped_session[Session]:
+        return DBConnectionHandler.create_session(db_url=get_db_url())

@@ -27,7 +27,7 @@ class UserRouter(BaseRouter):
         self.add_api_route("/", self.put_user, methods=["PUT"])
 
         # DELETE
-        # self.add_api_route("/{user_email}", self.delete_user_by_email, methods=["DELETE"])
+        self.add_api_route("/{user_email}", self.delete_user_by_email, methods=["DELETE"])
 
     async def get_all_users(self, language: Optional[LangEnum] = LangEnum.EN) -> BaseResponse:
         service = self.create_service()
@@ -77,13 +77,18 @@ class UserRouter(BaseRouter):
         except Exception as e:
             return self.return_exception(e)
 
-    # async def delete_user_by_email(self, user_email: str, language: Optional[LangEnum] = None) -> Response:
-    #     resp = self.db_conn.delete_user_by_email(user_email)
-    #
-    #     if resp is None:
-    #         raise HttpExceptions.UserNotFound(language)
-    #
-    #     return HttpResponses.NoContent()
+    async def delete_user_by_email(self, user_email: str, language: Optional[LangEnum] = LangEnum.EN) -> BaseResponse:
+        service = self.create_service()
+
+        try:
+
+            service.delete_user_by_email(user_email)
+
+            content = BaseContent(rc=ResponseCode.OK, data="User deleted")
+            return BaseResponse(status_code=st.HTTP_202_ACCEPTED, content=content)
+
+        except Exception as e:
+            return self.return_exception(e)
 
     def create_service(self) -> UserService:
         return UserService()
