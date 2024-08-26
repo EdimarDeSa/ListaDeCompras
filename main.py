@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI
 
 from app.Routers.base_router import BaseRouter
-from app.Routers.user_controller import UserRouter
+from app.Routers.user_router import UserRouter
 
 load_dotenv()
 
@@ -16,13 +16,8 @@ routers: list[type[BaseRouter]] = [
 
 DEBUG: bool = bool(int(getenv("DEBUG", "0")))
 
-app = FastAPI(title="Lista de compras", debug=DEBUG)
+app = FastAPI(title="Lista de compras", debug=DEBUG, docs_url="/docs")
+
 
 for router in routers:
     app.include_router(router())
-
-
-if __name__ == "__main__":
-    import uvicorn
-
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=DEBUG, reload_dirs=["app"])
