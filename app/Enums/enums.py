@@ -7,30 +7,24 @@ class LangEnum(StrEnum):
 
 
 class ResponseCode(IntEnum):
-    USER_EMAIL_EXISTS = -2
-    USER_NOT_FOUND = -1
     OK = 0
+
+    EMAIL_EXISTS = -1
+    EMAIL_INVALID = -2
+    EMAIL_SAME = -3
+
+    USER_NOT_FOUND = -4
+    USER_ID_EXISTS = -5
+
+    PASSWORD_NULL = -6
+    PASSWORD_SAME = -7
+    PASSWORD_LENGTH = -8
+    PASSWORD_NEED_LOWER_CASE = -9
+    PASSWORD_NEED_UPPER_CASE = -10
+    PASSWORD_NEED_NUMBER = -11
+    PASSWORD_NEED_SPECIAL_CHAR = -12
+
+    NAME_LENGTH = -13
+    NAME_NULL = -14
+
     UNKNOWN_ERROR = -999
-
-
-class MessagesEnum(StrEnum):
-    EMAIL_INVALID = "EmailInvalid"
-    EMAIL_SAME = "EmailSame"
-    PASSWORD_LENGTH = "PasswordLenght"
-    PASSWORD_NEED_LOWER_CASE = "PasswordNeedLowerCase"
-    PASSWORD_NEED_NUMBER = "PasswordNeedNumber"
-    PASSWORD_NEED_SPECIAL = "PasswordNeedSpecial"
-    PASSWORD_NEED_UPPER_CASE = "PasswordNeedUpperCase"
-    PASSWORD_NULL = "PasswordNull"
-    PASSWORD_SAME = "PasswordSame"
-    USER_EMAIL_USED = "UserEmailUsed"
-    USER_ID_EXISTS = "UserIdExists"
-    USER_NOT_FOUND = "UserNotFound"
-
-
-class HttpMethodsEnum(StrEnum):
-    DELETE = "DELETE"
-    GET = "GET"
-    PATCH = "PATCH"
-    POST = "POST"
-    PUT = "PUT"
