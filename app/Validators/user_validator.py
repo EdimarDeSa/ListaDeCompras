@@ -3,6 +3,7 @@ from logging import Logger
 
 import email_validator
 from fastapi import status as st
+from passlib.context import CryptContext
 from sqlalchemy.orm import scoped_session, Session
 
 from app.Enums.base_internal_exception import BaseInternalException
@@ -15,6 +16,7 @@ from app.Validators.base_validator import BaseValidator
 class UserValidator(BaseValidator):
     def __init__(self):
         self._logger = self._create_logger()
+        self._pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
     def validate_new_user(
         self, db_session: scoped_session[Session], query_obj: UserQuery, new_user: NewUser, language: LangEnum
@@ -22,6 +24,7 @@ class UserValidator(BaseValidator):
         self._validate_email(db_session, query_obj, new_user.email, language)
         self._validate_password(new_user.password, language)
         self._validate_name(new_user.name, language)
+        new_user.password = self._pwd_context.hash(new_user.password)
 
     def validate_update_data(
         self, db_session: scoped_session[Session], query_obj: UserQuery, update_data: UpdateUserDTO, language: LangEnum
@@ -33,7 +36,6 @@ class UserValidator(BaseValidator):
             self._validate_email(db_session, query_obj, update_data.email, language)
 
     def _validate_password(self, password: str, language: LangEnum) -> None:
-
         if not password:
             self.raise_error(ResponseCode.PASSWORD_NULL, language)
 
@@ -88,3 +90,16 @@ class UserValidator(BaseValidator):
             language=language,
             status_code=st.HTTP_400_BAD_REQUEST,
         )
+
+    def verify_password_hash(self, password: str, hashed_password: str, language: LangEnum) -> None:
+        is_valid = self._pwd_context.verify(secret=password, hash=hashed_password)
+
+        if is_valid is False:
+            raise BaseInternalException(
+                rc=ResponseCode.INVALID_CREDENTIALS,
+                language=language,
+                status_code=st.HTTP_400_BAD_REQUEST,
+            )
+
+    def hash_password(self, password: str) -> str:
+        return self._pwd_context.hash(secret=password)
