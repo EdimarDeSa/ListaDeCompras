@@ -27,4 +27,6 @@ class ResponseCode(IntEnum):
     NAME_LENGTH = -13
     NAME_NULL = -14
 
+    INVALID_CREDENTIALS = -15
+
     UNKNOWN_ERROR = -999
