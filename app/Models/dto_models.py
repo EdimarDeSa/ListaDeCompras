@@ -2,7 +2,7 @@ import uuid
 from datetime import date, datetime
 from typing import Optional
 
-from pydantic import Field, BaseModel
+from pydantic import Field, BaseModel, ConfigDict
 
 from app.Enums.enums import LangEnum
 from app.Schemas.requests.base_request import BaseRequest
@@ -19,14 +19,17 @@ class UserDTO(BaseRequest):
     birthdate: date
 
     def __eq__(self, other) -> bool:
-        return all(
-            [
-                self.id == other.id,
-                self.name == other.name,
-                self.email == other.email,
-                self.birthdate == other.birthdate,
-            ]
-        )
+        return all([self.id == other.id, self.email == other.email])
+
+
+class UserLoginDTO(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    name: str
+    password: str
+    email: str = Field(examples=["your.email@domain.com"])
+    language: LangEnum = LangEnum.EN
 
 
 class UpdateUserDTO(BaseModel):
@@ -38,8 +41,11 @@ class UpdateUserDTO(BaseModel):
     last_update: Optional[datetime] = Field(default_factory=datetime_now_utc, frozen=True)
 
 
-class NewUser(UserDTO):
+class NewUser(BaseRequest):
     password: str = Field(examples=["P@s5W0rD"])
+    email: str = Field(examples=["your.email@domain.com"])
+    language: LangEnum = LangEnum.EN
+    birthdate: date
 
 
 class DefaultCategoryDTO(BaseRequest):
