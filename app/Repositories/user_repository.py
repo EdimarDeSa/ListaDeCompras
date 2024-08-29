@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session, scoped_session
 
 from app.Enums.base_internal_exception import BaseInternalException
 from app.Enums.enums import LangEnum, ResponseCode
-from app.Models.dto_models import UserDTO, NewUser, UpdateUserDTO
+from app.Models.dto_models import UserDTO, NewUser, UpdateUserDTO, UserLoginDTO
 from app.Models.models import User
 from app.Querys.user_querys import UserQuery
 from app.Repositories.base_repository import BaseRepository
@@ -51,7 +51,37 @@ class UserRepository(BaseRepository):
                     status_code=st.HTTP_404_NOT_FOUND,
                 )
 
-            return UserDTO.model_validate(result[0])
+            return UserDTO.model_validate(result.User)
+
+        except Exception as e:
+            raise e
+
+    def read_by_email(
+        self,
+        db_session: scoped_session[Session],
+        query_obj: UserQuery,
+        user_email: str,
+        to_login: bool = False,
+        language: LangEnum = LangEnum.EN,
+    ) -> UserDTO | UserLoginDTO:
+        self.db_session = db_session
+
+        try:
+
+            query = query_obj.select_user_by_email(user_email)
+
+            result = self.db_session.execute(query).first()
+
+            if result is None:
+                raise BaseInternalException(
+                    rc=ResponseCode.USER_NOT_FOUND,
+                    language=language,
+                    status_code=st.HTTP_404_NOT_FOUND,
+                )
+
+            if to_login:
+                return UserLoginDTO.model_validate(result.User)
+            return UserDTO.model_validate(result.User)
 
         except Exception as e:
             raise e
@@ -116,7 +146,7 @@ class UserRepository(BaseRepository):
                     status_code=st.HTTP_404_NOT_FOUND,
                 )
 
-            user: User = result[0]
+            user: User = result.User
 
             query = _query.delete_user_by_id(user.id)
 
