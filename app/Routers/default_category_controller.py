@@ -1,12 +1,14 @@
 from typing import Optional
 
-from app.Enums.enums import LangEnum, HttpMethodsEnum
-from app.Enums.http_exceptions import HttpExceptions
 from app.Models.dto_models import DefaultCategoryDTO
-from app.Routers.base_router import BaseRouter
+from app.Routers.base_router import BaseRoutes
 
 
-class DefaultCategoryRouter(BaseRouter):
+class HttpExceptions:
+    pass
+
+
+class DefaultCategoryRoutes(BaseRoutes):
     def __init__(self) -> None:
         super().__init__(prefix="/default_categorys")
         self.__register_routes()

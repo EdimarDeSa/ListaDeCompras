@@ -1,17 +1,16 @@
 from fastapi import status as st
 
 from app.Enums.enums import ResponseCode
-from app.Enums.http_exceptions import InternalExceptions
 from app.Models.version_model import VersionModel
-from app.Routers.base_router import BaseRouter
+from app.Routers.base_router import BaseRoutes
 from app.Schemas.responses.base_response import BaseResponse, BaseContent
 from app.Services.utils_service import UtilsService
 
 
-class UtilsRouter(BaseRouter):
+class UtilsRoutes(BaseRoutes):
     def __init__(self):
         super().__init__()
-        self._service = self.create_service()
+        self._service = self._create_service()
 
         self.register_routes()
 
@@ -41,5 +40,5 @@ class UtilsRouter(BaseRouter):
         content = BaseContent(rc=ResponseCode.OK, data=version)
         return BaseResponse(status_code=st.HTTP_200_OK, content=content)
 
-    def create_service(self) -> UtilsService:
+    def _create_service(self) -> UtilsService:
         return UtilsService()

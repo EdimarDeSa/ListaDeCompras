@@ -1,13 +1,11 @@
 import uuid
 from typing import Optional
 
-from app.Enums.enums import LangEnum, HttpMethodsEnum
-from app.Enums.http_exceptions import HttpExceptions
 from app.Models.dto_models import UnityTypeDTO
-from app.Routers.base_router import BaseRouter
+from app.Routers.base_router import BaseRoutes
 
 
-class UnityTypeRouter(BaseRouter):
+class UnityTypeRoutes(BaseRoutes):
     def __init__(self) -> None:
         super().__init__(prefix="/unity_types")
         self.__register_routes()

@@ -3,9 +3,10 @@ import uuid
 from sqlalchemy import select, insert, delete, update, Select, Delete, Update, Insert
 
 from app.Models.models import User
+from app.Querys.base_query import BaseQuery
 
 
-class UserQuery:
+class UserQuery(BaseQuery):
     @staticmethod
     def select_all_users() -> Select[tuple[User]]:
         return select(User).order_by(User.name)

@@ -132,8 +132,7 @@ class UserService(BaseService):
     def _create_logger(self) -> Logger:
         return Logger(__name__)
 
-    @staticmethod
-    def _create_query():
+    def _create_query(self) -> UserQuery:
         return UserQuery()
 
     def _create_db_session(self) -> scoped_session[Session]:

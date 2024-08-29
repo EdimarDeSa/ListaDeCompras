@@ -202,6 +202,7 @@ def test_delete_user_by_email_success(client, moc_user):
     assert response.status_code == 202
     assert json_data["rc"] == ResponseCode.OK
 
+
 def test_delete_user_by_email_fail(client, moc_user, fake_data):
     user_email = fake_data.email()
 
