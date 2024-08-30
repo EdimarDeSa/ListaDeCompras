@@ -2,11 +2,11 @@ import re
 from logging import Logger
 
 import email_validator
+from app.ResponseCode.base_internal_exception import BaseInternalResponses
 from fastapi import status as st
 from passlib.context import CryptContext
 from sqlalchemy.orm import scoped_session, Session
 
-from app.Enums.base_internal_exception import BaseInternalException
 from app.Enums.enums import LangEnum, ResponseCode
 from app.Models.dto_models import NewUser, UpdateUserDTO
 from app.Querys.user_querys import UserQuery
@@ -85,7 +85,7 @@ class UserValidator(BaseValidator):
         return Logger(__name__)
 
     def raise_error(self, error: ResponseCode, language: LangEnum) -> None:
-        raise BaseInternalException(
+        raise BaseInternalResponses(
             rc=error,
             language=language,
             status_code=st.HTTP_400_BAD_REQUEST,
@@ -95,7 +95,7 @@ class UserValidator(BaseValidator):
         is_valid = self._pwd_context.verify(secret=password, hash=hashed_password)
 
         if is_valid is False:
-            raise BaseInternalException(
+            raise BaseInternalResponses(
                 rc=ResponseCode.INVALID_CREDENTIALS,
                 language=language,
                 status_code=st.HTTP_400_BAD_REQUEST,

@@ -1,12 +1,10 @@
 from uuid import UUID
 
-from fastapi import status as st
 from sqlalchemy.orm import Session, scoped_session
 
-from app.Enums.base_internal_exception import BaseInternalException
 from app.Enums.enums import LangEnum, ResponseCode
+from app.InternalResponse.internal_errors import InternalErrors
 from app.Models.dto_models import UserDTO, NewUser, UpdateUserDTO, UserLoginDTO
-from app.Models.models import User
 from app.Querys.user_querys import UserQuery
 from app.Repositories.base_repository import BaseRepository
 
@@ -21,11 +19,7 @@ class UserRepository(BaseRepository):
             result = self.db_session.execute(query).all()
 
             if result is None:
-                raise BaseInternalException(
-                    rc=ResponseCode.USER_NOT_FOUND,
-                    language=language,
-                    status_code=st.HTTP_404_NOT_FOUND,
-                )
+                raise InternalErrors.NOT_FOUND_404(rc=ResponseCode.USER_NOT_FOUND, language=language)
 
             return [UserDTO.model_validate(row.User, from_attributes=True) for row in result]
 
@@ -45,11 +39,7 @@ class UserRepository(BaseRepository):
             result = self.db_session.execute(query).first()  # type: ignore
 
             if result is None:
-                raise BaseInternalException(
-                    rc=ResponseCode.USER_NOT_FOUND,
-                    language=language,
-                    status_code=st.HTTP_404_NOT_FOUND,
-                )
+                raise InternalErrors.NOT_FOUND_404(rc=ResponseCode.USER_NOT_FOUND, language=language)
 
             return UserDTO.model_validate(result.User)
 
@@ -73,11 +63,7 @@ class UserRepository(BaseRepository):
             result = self.db_session.execute(query).first()
 
             if result is None:
-                raise BaseInternalException(
-                    rc=ResponseCode.USER_NOT_FOUND,
-                    language=language,
-                    status_code=st.HTTP_404_NOT_FOUND,
-                )
+                raise InternalErrors.NOT_FOUND_404(rc=ResponseCode.USER_NOT_FOUND, language=language)
 
             if to_login:
                 return UserLoginDTO.model_validate(result.User)
@@ -102,25 +88,18 @@ class UserRepository(BaseRepository):
             raise e
 
     def update_user(
-        self, db_session: scoped_session[Session], query_obj: UserQuery, update_data: UpdateUserDTO
+        self, db_session: scoped_session[Session], query_obj: UserQuery, update_data: UpdateUserDTO, language: LangEnum
     ) -> UpdateUserDTO:
         self.db_session = db_session
         cleaned_data = self._clean_update_data(update_data)
 
         try:
 
-            query = query_obj.select_user_by_id(update_data.id)
+            user = self.read_by_id(
+                db_session=db_session, query_obj=query_obj, user_id=update_data.id, language=language
+            )
 
-            result = self.db_session.execute(query).first()
-
-            if result is None:
-                raise BaseInternalException(
-                    rc=ResponseCode.USER_NOT_FOUND,
-                    language=update_data.language,
-                    status_code=st.HTTP_404_NOT_FOUND,
-                )
-
-            query = query_obj.update_user_by_id(update_data.id, **cleaned_data)
+            query = query_obj.update_user_by_id(user.id, **cleaned_data)
 
             self.db_session.execute(query)
             self.db_session.flush()
@@ -130,27 +109,20 @@ class UserRepository(BaseRepository):
         except Exception as e:
             raise e
 
-    def delete_user_by_email(self, db_session: scoped_session[Session], _query: UserQuery, user_email: str) -> None:
+    def delete_user_by_email(
+        self, db_session: scoped_session[Session], query_obj: UserQuery, user_email: str, language: LangEnum
+    ) -> None:
         self.db_session = db_session
 
         try:
+            user: UserDTO = self.read_by_email(
+                db_session=db_session, query_obj=query_obj, user_email=user_email, language=language
+            )
 
-            query = _query.select_user_by_email(user_email)
-
-            result = self.db_session.execute(query).first()
-
-            if result is None:
-                raise BaseInternalException(
-                    rc=ResponseCode.USER_NOT_FOUND,
-                    language=LangEnum.EN,
-                    status_code=st.HTTP_404_NOT_FOUND,
-                )
-
-            user: User = result.User
-
-            query = _query.delete_user_by_id(user.id)
+            query = query_obj.delete_user_by_id(user.id)
 
             self.db_session.execute(query)
+            self.db_session.flush()
 
         except Exception as e:
             raise e

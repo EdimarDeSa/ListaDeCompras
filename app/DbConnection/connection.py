@@ -28,37 +28,6 @@ class DBConnectionHandler:
 
         return scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
 
-    # def read_unity_type_by_id(self, id_: uuid.UUID) -> Optional[UnityTypeDTO]:
-    #     with Session(self.__engine) as session:
-    #         query = sa.select(UnityType).where(UnityType.id == id_)
-    #         row = session.execute(query).first()
-    #     if row is None:
-    #         return None
-    #     return self.__unity_type_to_dto(row.UnityType)
-    # |
-    # def read_unity_type_by_name(self, name: str) -> Optional[UnityTypeDTO]:
-    #     with Session(self.__engine) as session:
-    #         query = sa.select(UnityType).where(UnityType.name == name)
-    #         row = session.execute(query).first()
-    #     if row is None:
-    #         return None
-    #     return self.__unity_type_to_dto(row.UnityType)
-    #
-    # def read_all_unity_types(self) -> list[UnityTypeDTO]:
-    #     with Session(self.__engine) as session:
-    #         query = sa.select(UnityType).order_by(UnityType.name)
-    #         rows = session.execute(query).all()
-    #
-    #     return [self.__unity_type_to_dto(row.UnityType) for row in rows]
-    #
-    # def read_all_default_categorys(self) -> list[DefaultCategoryDTO]:
-    #     with Session(self.__engine) as session:
-    #         query = sa.select(DefaultCategory).order_by(DefaultCategory.name)
-    #         rows = session.execute(query).all()
-    #
-    #     return [self.__default_category_to_dto(row.DefaultCategory) for row in rows]
-
-    #
     # def __test_connection(self) -> None:
     #     retries, max_retries = 0, 5
     #     while retries < max_retries:

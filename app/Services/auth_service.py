@@ -4,13 +4,13 @@ from logging import Logger
 from typing import Annotated
 
 import jwt
+from app.ResponseCode.base_internal_exception import BaseInternalResponses
 from fastapi import Depends
 from fastapi import status as st
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import scoped_session, Session
 
 from app.DbConnection.connection import DBConnectionHandler, get_db_url
-from app.Enums.base_internal_exception import BaseInternalException
 from app.Enums.enums import ResponseCode, LangEnum
 from app.Models.dto_models import UserLoginDTO
 from app.Models.token_model import Token, TokenData
@@ -51,7 +51,7 @@ class AuthService(BaseService):
 
         except Exception as e:
             self._logger.exception(e)
-            if isinstance(e, BaseInternalException):
+            if isinstance(e, BaseInternalResponses):
                 if e.rc == ResponseCode.USER_NOT_FOUND:
                     e.rc = ResponseCode.INVALID_CREDENTIALS
             raise e
@@ -74,7 +74,6 @@ class AuthService(BaseService):
 
     @staticmethod
     def decode_token(token: Annotated[Token, Depends(oauth2_scheme)]) -> TokenData:
-        print(token)
         try:
             payload: dict = jwt.decode(
                 jwt=token,
@@ -85,7 +84,7 @@ class AuthService(BaseService):
             current_user = TokenData.model_validate(payload)
 
             if current_user.is_active is False:
-                raise BaseInternalException(
+                raise BaseInternalResponses(
                     rc=ResponseCode.INVALID_CREDENTIALS,
                     language=LangEnum.EN,
                     status_code=st.HTTP_400_BAD_REQUEST,

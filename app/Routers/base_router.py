@@ -3,8 +3,9 @@ from abc import ABC, abstractmethod
 from fastapi import APIRouter
 from fastapi import status as st
 
-from app.Enums.base_internal_exception import BaseInternalException
 from app.Enums.enums import ResponseCode
+from app.InternalResponse.base_internal_response import BaseInternalResponses
+from app.InternalResponse.internal_errors import InternalErrors
 from app.Schemas.responses.base_response import BaseResponse, BaseContent
 from app.Services.user_service import BaseService
 
@@ -18,7 +19,7 @@ class BaseRoutes(ABC):
 
     @staticmethod
     def return_exception(e: Exception) -> BaseResponse:
-        if isinstance(e, BaseInternalException):
+        if isinstance(e, BaseInternalResponses):
             content = BaseContent(rc=e.rc, data=e.message)
             return BaseResponse(status_code=e.status_code, content=content)
 
@@ -30,13 +31,13 @@ class BaseRoutes(ABC):
         return APIRouter(**kwargs)
 
     @property
-    def router(self):
+    def api_router(self):
         if self._router is None:
-            raise Exception("Router not created")
+            raise InternalErrors.SERVICE_UNAVAILABLE_503(ResponseCode.ROUTER_NOT_DEFINED)
         return self._router
 
-    @router.setter
-    def router(self, value: APIRouter) -> None:
+    @api_router.setter
+    def api_router(self, value: APIRouter) -> None:
         if self._router is not None:
-            raise Exception("Router already created")
+            raise InternalErrors.INTERNAL_SERVER_ERROR_500(ResponseCode.ROUTER_ALREADY_EXISTS)
         self._router = value
