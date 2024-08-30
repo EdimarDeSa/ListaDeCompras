@@ -1,23 +1,40 @@
-from os import getenv
+import time
 
 from dotenv import load_dotenv
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
 
-from app.Routers.base_router import BaseRouter
-from app.Routers.user_router import UserRouter
+from app.configs import *
 
 load_dotenv()
 
-routers: list[type[BaseRouter]] = [
-    UserRouter,
-    # UnityTypeRouter,
-    # DefaultCategoryRouter,
-]
 
-DEBUG: bool = bool(int(getenv("DEBUG", "0")))
+app = FastAPI(
+    title="Lista de compras",
+    debug=DEBUG,
+    docs_url="/docs",
+    contact={"name": "Edimar de Sá", "email": "edimar.sa@efscode.com"},
+)
 
-app = FastAPI(title="Lista de compras", debug=DEBUG, docs_url="/docs")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
+@app.middleware("http")
+async def add_process_time_header(request: Request, call_next):
+    start_time = time.time()
+
+    response = await call_next(request)
+    process_time = time.time() - start_time
+    response.headers["X-Process-Time"] = str(process_time)
+    return response
+
+
+# Registra todos os roteadores listados
 for router in routers:
-    app.include_router(router())
+    app.include_router(router().router)

@@ -8,7 +8,7 @@ from app.Models.dto_models import NewUser, UpdateUserDTO, UserDTO
 from app.Models.token_model import TokenData
 from app.Routers.base_router import BaseRoutes
 from app.Schemas.responses.base_response import BaseResponse, BaseContent
-from app.Services.auth_service import get_current_user
+from app.Services.auth_service import decode_token
 from app.Services.user_service import UserService
 
 
@@ -20,8 +20,8 @@ class UserRoutes(BaseRoutes):
     def __register_routes(self) -> None:
         # GET
         self.router.add_api_route("/all", self.get_all_users, methods=["GET"])
-        self.router.add_api_route("/{user_id}", self.get_user_by_id, methods=["GET"])
         self.router.add_api_route("/me", self.get_me, methods=["GET"])
+        self.router.add_api_route("/{user_id}", self.get_user_by_id, methods=["GET"])
 
         # POST
         self.router.add_api_route("/", self.post_new_user, methods=["POST"])
@@ -32,10 +32,8 @@ class UserRoutes(BaseRoutes):
         # DELETE
         self.router.add_api_route("/{user_email}", self.delete_user_by_email, methods=["DELETE"])
 
-    async def get_me(self, current_user: Annotated[TokenData, Depends(get_current_user)]) -> BaseResponse:
-        print(current_user)
+    async def get_me(self, current_user: Annotated[TokenData, Depends(decode_token)]) -> BaseResponse:
         service = self._create_service()
-
         try:
             user_dto = service.read_by_id(current_user.id, current_user.language)
 
