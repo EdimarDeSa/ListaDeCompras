@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import Optional
-from uuid import UUID
+from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field, ConfigDict
 
@@ -10,7 +10,7 @@ from app.Utils.global_functions import datetime_now_utc
 class BaseRequest(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    id: Optional[UUID] = Field(default=None, frozen=True)
+    id: UUID = Field(default_factory=uuid4, frozen=True, exclude=True)
     name: str
-    creation: Optional[datetime] = Field(default_factory=datetime_now_utc, frozen=True)
-    last_update: Optional[datetime] = Field(default_factory=datetime_now_utc, frozen=True)
+    creation: Optional[datetime] = Field(default_factory=datetime_now_utc, frozen=True, exclude=True)
+    last_update: datetime = Field(default_factory=datetime_now_utc, frozen=True, exclude=True)

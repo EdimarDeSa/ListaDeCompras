@@ -18,13 +18,13 @@ class BaseRoutes(ABC):
         pass
 
     @staticmethod
-    def return_exception(e: Exception) -> BaseResponse:
+    def return_exception(e: Exception, **kwargs) -> BaseResponse:
         if isinstance(e, BaseInternalResponses):
             content = BaseContent(rc=e.rc, data=e.message)
-            return BaseResponse(status_code=e.status_code, content=content)
+            return BaseResponse(status_code=e.status_code, content=content, **kwargs)
 
         content = BaseContent(rc=ResponseCode.UNKNOWN_ERROR)
-        return BaseResponse(status_code=st.HTTP_500_INTERNAL_SERVER_ERROR, content=content)
+        return BaseResponse(status_code=st.HTTP_500_INTERNAL_SERVER_ERROR, content=content, **kwargs)
 
     @staticmethod
     def create_api_router(**kwargs) -> APIRouter:

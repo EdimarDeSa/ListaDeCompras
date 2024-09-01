@@ -1,11 +1,11 @@
 import uuid
 from typing import Optional, Annotated
 
-from fastapi import status as st, Depends
+from fastapi import Request, status as st, Depends
 
+from app.DataBase.models.dto_models import NewUser, UpdateUserDTO, UserDTO
+from app.DataBase.models.token_model import TokenData
 from app.Enums.enums import ResponseCode, LangEnum
-from app.Models.dto_models import NewUser, UpdateUserDTO, UserDTO
-from app.Models.token_model import TokenData
 from app.Routers.base_router import BaseRoutes
 from app.Schemas.responses.base_response import BaseResponse, BaseContent
 from app.Services.auth_service import decode_token
@@ -14,25 +14,25 @@ from app.Services.user_service import UserService
 
 class UserRoutes(BaseRoutes):
     def __init__(self) -> None:
-        self.router = self.create_api_router(prefix="/users", tags=["Users"])
+        self.api_router = self.create_api_router(prefix="/users", tags=["Users"])
         self.__register_routes()
 
     def __register_routes(self) -> None:
         # GET
-        self.router.add_api_route("/all", self.get_all_users, methods=["GET"])
-        self.router.add_api_route("/me", self.get_me, methods=["GET"])
-        self.router.add_api_route("/{user_id}", self.get_user_by_id, methods=["GET"])
+        # self.api_router.add_api_route("/all", self.get_all_users, methods=["GET"])
+        self.api_router.add_api_route("/me", self.get_me, methods=["GET"])
+        # self.api_router.add_api_route("/{user_id}", self.get_user_by_id, methods=["GET"])
 
         # POST
-        self.router.add_api_route("/", self.post_new_user, methods=["POST"])
+        self.api_router.add_api_route("/", self.post_new_user, methods=["POST"])
 
         # PUT
-        self.router.add_api_route("/", self.put_user, methods=["PUT"])
+        self.api_router.add_api_route("/", self.put_user, methods=["PUT"])
 
         # DELETE
-        self.router.add_api_route("/{user_email}", self.delete_user_by_email, methods=["DELETE"])
+        self.api_router.add_api_route("/{user_email}", self.delete_user_when_logged, methods=["DELETE"])
 
-    async def get_me(self, current_user: Annotated[TokenData, Depends(decode_token)]) -> BaseResponse:
+    async def get_me(self, request: Request, current_user: Annotated[TokenData, Depends(decode_token)]) -> BaseResponse:
         service = self._create_service()
         try:
             user_dto = service.read_by_id(current_user.id, current_user.language)
@@ -43,7 +43,7 @@ class UserRoutes(BaseRoutes):
         except Exception as e:
             return self.return_exception(e)
 
-    async def get_all_users(self, language: Optional[LangEnum] = LangEnum.EN) -> BaseResponse:
+    async def get_all_users(self, request: Request, language: Optional[LangEnum] = LangEnum.EN) -> BaseResponse:
         service = self._create_service()
 
         try:
@@ -55,7 +55,13 @@ class UserRoutes(BaseRoutes):
         except Exception as e:
             return self.return_exception(e)
 
-    async def get_user_by_id(self, user_id: uuid.UUID, language: Optional[LangEnum] = LangEnum.EN) -> BaseResponse:
+    async def get_user_by_id(
+        self,
+        request: Request,
+        current_user: Annotated[TokenData, Depends(decode_token)],
+        user_id: uuid.UUID,
+        language: Optional[LangEnum] = LangEnum.EN,
+    ) -> BaseResponse:
         service = self._create_service()
 
         try:
@@ -67,8 +73,14 @@ class UserRoutes(BaseRoutes):
         except Exception as e:
             return self.return_exception(e)
 
-    async def post_new_user(self, new_user: NewUser, language: Optional[LangEnum] = LangEnum.EN) -> BaseResponse:
+    async def post_new_user(
+        self, request: Request, new_user: NewUser, language: Optional[LangEnum] = LangEnum.EN
+    ) -> BaseResponse:
         service = self._create_service()
+
+        if request.headers["Authorization"]:
+            content = BaseContent(rc=ResponseCode.ALREADY_LOGGED)
+            return BaseResponse(status_code=st.HTTP_403_FORBIDDEN, content=content)
 
         try:
 
@@ -80,10 +92,17 @@ class UserRoutes(BaseRoutes):
         except Exception as e:
             return self.return_exception(e)
 
-    async def put_user(self, update_data: UpdateUserDTO, language: Optional[LangEnum] = LangEnum.EN) -> BaseResponse:
+    async def put_user(
+        self,
+        request: Request,
+        current_user: Annotated[TokenData, Depends(decode_token)],
+        update_data: UpdateUserDTO,
+    ) -> BaseResponse:
         service = self._create_service()
         try:
-            updated_data = service.update_user(update_data, language)
+            user_id = current_user.id
+            language = current_user.language
+            updated_data = service.update_user(user_id, update_data, language)
 
             content = BaseContent(rc=ResponseCode.OK, data=updated_data)
             return BaseResponse(status_code=st.HTTP_202_ACCEPTED, content=content)
@@ -91,12 +110,17 @@ class UserRoutes(BaseRoutes):
         except Exception as e:
             return self.return_exception(e)
 
-    async def delete_user_by_email(self, user_email: str, language: Optional[LangEnum] = LangEnum.EN) -> BaseResponse:
+    async def delete_user_when_logged(
+        self,
+        request: Request,
+        current_user: Annotated[TokenData, Depends(decode_token)],
+    ) -> BaseResponse:
         service = self._create_service()
+        user_id = current_user.id
 
         try:
 
-            service.delete_user_by_email(user_email)
+            service.delete_user_by_id(user_id, current_user.language)
 
             content = BaseContent(rc=ResponseCode.OK, data="User deleted")
             return BaseResponse(status_code=st.HTTP_202_ACCEPTED, content=content)

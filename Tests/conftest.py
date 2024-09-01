@@ -1,11 +1,11 @@
+from app.Models.models import User
 from faker import Faker
 from fastapi.testclient import TestClient
 from pytest import fixture
 
-from app.DbConnection.connection import DBConnectionHandler, get_db_url
+from app.DataBase.connection import DBConnectionHandler, get_db_url
+from app.DataBase.models.dto_models import UserDTO
 from app.Enums.enums import LangEnum
-from app.Models.dto_models import UserDTO
-from app.Models.models import User
 from main import app
 
 

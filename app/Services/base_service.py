@@ -3,13 +3,11 @@ from logging import Logger
 
 from sqlalchemy.orm import scoped_session, Session
 
-from app.Querys.base_query import BaseQuery
 from app.Repositories.user_repository import BaseRepository
 from app.Validators.base_validator import BaseValidator
 
 
 class BaseService(ABC):
-
     @abstractmethod
     def _create_db_session(self) -> scoped_session[Session]:
         pass
@@ -20,10 +18,6 @@ class BaseService(ABC):
 
     @abstractmethod
     def _create_validator(self) -> type[BaseValidator]:
-        pass
-
-    @abstractmethod
-    def _create_query(self) -> type[BaseQuery]:
         pass
 
     @abstractmethod

@@ -1,6 +1,6 @@
 from typing import Optional
 
-from app.Models.dto_models import DefaultCategoryDTO
+from app.DataBase.models.dto_models import DefaultCategoryDTO
 from app.Routers.base_router import BaseRoutes
 
 

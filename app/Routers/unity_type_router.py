@@ -1,7 +1,7 @@
 import uuid
 from typing import Optional
 
-from app.Models.dto_models import UnityTypeDTO
+from app.DataBase.models.dto_models import UnityTypeDTO
 from app.Routers.base_router import BaseRoutes
 
 

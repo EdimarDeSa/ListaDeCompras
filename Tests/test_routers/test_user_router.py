@@ -1,12 +1,12 @@
 import uuid
 
+from app.Models.models import User
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy import delete
 
-from app.DbConnection.connection import DBConnectionHandler, get_db_url
+from app.DataBase.connection import DBConnectionHandler, get_db_url
+from app.DataBase.models.dto_models import UserDTO
 from app.Enums.enums import ResponseCode
-from app.Models.dto_models import UserDTO
-from app.Models.models import User
 from app.Utils.global_functions import MsgLoader
 
 """

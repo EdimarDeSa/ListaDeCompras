@@ -1,7 +1,7 @@
-from fastapi import status as st
+from fastapi import status as st, Request
 
-from app.Enums.enums import ResponseCode
-from app.Models.version_model import VersionModel
+from app.DataBase.models.version_model import VersionModel
+from app.Enums.enums import ResponseCode, LangEnum
 from app.Routers.base_router import BaseRoutes
 from app.Schemas.responses.base_response import BaseResponse, BaseContent
 from app.Services.utils_service import UtilsService
@@ -9,36 +9,34 @@ from app.Services.utils_service import UtilsService
 
 class UtilsRoutes(BaseRoutes):
     def __init__(self):
-        super().__init__()
+        self.api_router = self.create_api_router(tags=["Utils"])
         self._service = self._create_service()
 
         self.register_routes()
 
     def register_routes(self):
-        self.add_api_route("/utils/healthcheck", self.healthcheck, methods=["GET"])
-        self.add_api_route("/utils/version", self.version, methods=["GET"])
+        self._router.add_api_route("/health", self.health, methods=["GET"])
+        self._router.add_api_route("/version", self.version, methods=["GET"])
 
-    def healthcheck(self) -> BaseResponse:
+    def health(self, request: Request) -> BaseResponse:
         try:
-            self._service.check_health()
+            result = self._service.check_health(LangEnum.EN)
 
-        except InternalExceptions as e:
-            content = BaseContent(rc=ResponseCode.OK, data=str(e))
-            return BaseResponse(status_code=st.HTTP_500_INTERNAL_SERVER_ERROR, content=content)
+            content = BaseContent(rc=0, data=result.message)
+            return BaseResponse(status_code=200, content=content)
 
-        content = BaseContent(rc=ResponseCode.OK, data="OK")
-        return BaseResponse(status_code=st.HTTP_200_OK, content=content)
+        except Exception as e:
+            self.return_exception(e)
 
-    def version(self) -> BaseResponse:
+    def version(self, request: Request) -> BaseResponse:
         try:
             version: VersionModel = self._service.get_version()
 
-        except InternalExceptions as e:
-            content = BaseContent(rc=e.rc, data=str(e))
-            return BaseResponse(status_code=st.HTTP_500_INTERNAL_SERVER_ERROR, content=content)
+            content = BaseContent(rc=ResponseCode.OK, data=version)
+            return BaseResponse(status_code=st.HTTP_200_OK, content=content)
 
-        content = BaseContent(rc=ResponseCode.OK, data=version)
-        return BaseResponse(status_code=st.HTTP_200_OK, content=content)
+        except Exception as e:
+            self.return_exception(e)
 
     def _create_service(self) -> UtilsService:
         return UtilsService()

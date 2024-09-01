@@ -2,38 +2,33 @@ import re
 from logging import Logger
 
 import email_validator
-from app.ResponseCode.base_internal_exception import BaseInternalResponses
 from fastapi import status as st
 from passlib.context import CryptContext
 from sqlalchemy.orm import scoped_session, Session
 
+from app.DataBase.models.dto_models import NewUser, UpdateUserDTO
 from app.Enums.enums import LangEnum, ResponseCode
-from app.Models.dto_models import NewUser, UpdateUserDTO
-from app.Querys.user_querys import UserQuery
+from app.InternalResponse.base_internal_response import BaseInternalResponses
 from app.Validators.base_validator import BaseValidator
 
 
 class UserValidator(BaseValidator):
     def __init__(self):
         self._logger = self._create_logger()
-        self._pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+        self._pwd_context = CryptContext(schemes=["bcrypt"])
+        super(UserValidator, self).__init__()
 
-    def validate_new_user(
-        self, db_session: scoped_session[Session], query_obj: UserQuery, new_user: NewUser, language: LangEnum
-    ):
-        self._validate_email(db_session, query_obj, new_user.email, language)
+    def validate_new_user(self, db_session: scoped_session[Session], new_user: NewUser, language: LangEnum):
+        self._validate_email(db_session, new_user.email, language)
         self._validate_password(new_user.password, language)
         self._validate_name(new_user.name, language)
         new_user.password = self._pwd_context.hash(new_user.password)
 
     def validate_update_data(
-        self, db_session: scoped_session[Session], query_obj: UserQuery, update_data: UpdateUserDTO, language: LangEnum
+        self, db_session: scoped_session[Session], update_data: UpdateUserDTO, language: LangEnum
     ) -> None:
         if update_data.name is not None:
             self._validate_name(update_data.name, language)
-
-        if update_data.email is not None:
-            self._validate_email(db_session, query_obj, update_data.email, language)
 
     def _validate_password(self, password: str, language: LangEnum) -> None:
         if not password:
@@ -54,13 +49,11 @@ class UserValidator(BaseValidator):
         if not re.search(r"[\W_]", password):
             self.raise_error(ResponseCode.PASSWORD_NEED_SPECIAL_CHAR, language)
 
-    def _validate_email(
-        self, db_session: scoped_session[Session], query_obj: UserQuery, email: str, language: LangEnum
-    ) -> None:
+    def _validate_email(self, db_session: scoped_session[Session], email: str, language: LangEnum) -> None:
         try:
             email_validator.validate_email(email, check_deliverability=False)
 
-            query = query_obj.select_user_by_email(email)
+            query = self.query.select_user_by_email(email)
 
             result = db_session.execute(query).first()
 

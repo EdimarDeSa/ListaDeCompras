@@ -1,12 +1,12 @@
 import uuid
 
-from sqlalchemy import select, insert, delete, update, Select, Delete, Update, Insert
+from sqlalchemy import Select, Update, Insert, TextClause
+from sqlalchemy import select, update, insert, text
 
-from app.Models.models import User
-from app.Querys.base_query import BaseQuery
+from app.DataBase.schemas.user_schema import User
 
 
-class UserQuery(BaseQuery):
+class Query:
     @staticmethod
     def select_all_users() -> Select[tuple[User]]:
         return select(User).order_by(User.name)
@@ -20,8 +20,8 @@ class UserQuery(BaseQuery):
         return select(User).where(User.email == email)
 
     @staticmethod
-    def delete_user_by_id(user_id: uuid.UUID) -> Delete[User]:
-        return delete(User).where(User.id == user_id)
+    def delete_user_by_id(user_id: uuid.UUID) -> Update[User]:
+        return update(User).where(User.id == user_id).values(is_active=False)
 
     @staticmethod
     def update_user_by_id(user_id: uuid.UUID, **kwargs) -> Update[User]:
@@ -30,3 +30,7 @@ class UserQuery(BaseQuery):
     @staticmethod
     def insert_user(**kwargs) -> Insert[User]:
         return insert(User).values(**kwargs)
+
+    @staticmethod
+    def test_communication() -> TextClause[str]:
+        return text("SELECT 1")

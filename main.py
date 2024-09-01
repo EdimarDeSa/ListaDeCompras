@@ -3,10 +3,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 import logging
-import time
 
-from fastapi import FastAPI, Request
-from fastapi.middleware.cors import CORSMiddleware
+from fastapi import FastAPI
 
 from app.configs import *
 
@@ -20,26 +18,16 @@ app = FastAPI(
     contact={"name": "Edimar de Sá", "email": "edimar.sa@efscode.com"},
 )
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
-
-@app.middleware("http")
-async def add_process_time_header(request: Request, call_next):
-    start_time = time.time()
-
-    response = await call_next(request)
-    process_time = time.time() - start_time
-    response.headers["X-Process-Time"] = str(process_time)
-    return response
+for middleware in middlewares:
+    if "http" in middleware.get("options", False):
+        app.middleware("http")(middleware["middleware_class"])
+    else:
+        app.add_middleware(middleware["middleware_class"], **middleware["options"])
 
 
 # Registra todos os roteadores listados
 for router in routers:
-    logger.debug(f"Iniciando - {router.__name__}")
-    app.include_router(router().api_router)
+    r = router()
+    logger.debug(f"Iniciando - {r.__class__.__name__}")
+    app.include_router(r.api_router)

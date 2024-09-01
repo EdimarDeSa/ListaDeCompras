@@ -4,17 +4,16 @@ from logging import Logger
 from typing import Annotated
 
 import jwt
-from app.ResponseCode.base_internal_exception import BaseInternalResponses
 from fastapi import Depends
-from fastapi import status as st
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import scoped_session, Session
 
-from app.DbConnection.connection import DBConnectionHandler, get_db_url
+from app.DataBase.connection import DBConnectionHandler, get_db_url
+from app.DataBase.models.dto_models import UserLoginDTO
+from app.DataBase.models.token_model import Token, TokenData
 from app.Enums.enums import ResponseCode, LangEnum
-from app.Models.dto_models import UserLoginDTO
-from app.Models.token_model import Token, TokenData
-from app.Querys.user_querys import UserQuery
+from app.InternalResponse.base_internal_response import BaseInternalResponses
+from app.InternalResponse.internal_errors import InternalErrors
 from app.Repositories.user_repository import UserRepository
 from app.Services.base_service import BaseService
 from app.Utils.global_functions import datetime_now_utc
@@ -24,13 +23,11 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
 class AuthService(BaseService):
-
     def __init__(self) -> None:
         self._db_session = self._create_db_session()
         self._repository = self._create_repository()
         self._validator = self._create_validator()
         self._logger = self._create_logger()
-        self._query = self._create_query()
 
     def authenticate_user(self, user_email: str, password: str, language: LangEnum) -> Token:
         self._logger.info("Starting authenticate_user")
@@ -38,7 +35,6 @@ class AuthService(BaseService):
         try:
             user: UserLoginDTO = self._repository.read_by_email(
                 db_session=self._db_session,
-                query_obj=self._query,
                 user_email=user_email,
                 to_login=True,
                 language=language,
@@ -84,15 +80,31 @@ class AuthService(BaseService):
             current_user = TokenData.model_validate(payload)
 
             if current_user.is_active is False:
-                raise BaseInternalResponses(
-                    rc=ResponseCode.INVALID_CREDENTIALS,
-                    language=LangEnum.EN,
-                    status_code=st.HTTP_400_BAD_REQUEST,
-                )
+                raise InternalErrors.UNAUTHORIZED_401(ResponseCode.INVALID_CREDENTIALS, LangEnum.EN)
 
             return current_user
         except Exception as e:
             raise e
+
+    def refresh_jwt_token(self, refresh_token: str, language: LangEnum) -> Token:
+        """
+        Atualiza o token JWT se o token de atualização fornecido for válido.
+        """
+        try:
+            # Decodifica o token de atualização
+            decoded_data: dict = jwt.decode(
+                jwt=refresh_token,
+                key=os.getenv("SECRET_KEY"),
+                algorithms=[os.getenv("ALGORITHM")],
+            )
+            # Cria um novo token com base nos dados decodificados
+            new_token = self.create_access_token(user=UserLoginDTO(**decoded_data))
+            return new_token
+
+        except jwt.ExpiredSignatureError:
+            raise InternalErrors.UNAUTHORIZED_401(ResponseCode.TOKEN_EXPIRED, language)
+        except jwt.InvalidTokenError:
+            raise InternalErrors.UNAUTHORIZED_401(ResponseCode.INVALID_TOKEN, language)
 
     def _create_db_session(self) -> scoped_session[Session]:
         return DBConnectionHandler.create_session(db_url=get_db_url())
@@ -105,9 +117,6 @@ class AuthService(BaseService):
 
     def _create_logger(self) -> Logger:
         return Logger(__name__)
-
-    def _create_query(self) -> UserQuery:
-        return UserQuery()
 
     def __get_expire_time(self) -> int:
         expires_delta = timedelta(minutes=int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 15)))

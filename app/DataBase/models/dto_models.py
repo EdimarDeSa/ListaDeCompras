@@ -18,7 +18,7 @@ class UserDTO(BaseRequest):
     language: LangEnum = LangEnum.EN
     birthdate: date
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: "UserDTO") -> bool:
         return all([self.id == other.id, self.email == other.email])
 
 
@@ -33,12 +33,15 @@ class UserLoginDTO(BaseModel):
 
 
 class UpdateUserDTO(BaseModel):
-    id: uuid.UUID
     name: Optional[str] = None
-    email: Optional[str] = Field(default=None, examples=["your.email@domain.com"])
     language: Optional[LangEnum] = None
     birthdate: Optional[date] = None
-    last_update: Optional[datetime] = Field(default_factory=datetime_now_utc, frozen=True)
+    last_update: datetime = Field(default_factory=datetime_now_utc, exclude=True)
+
+
+class UpdateUserEmailDTO(BaseModel):
+    email: str = Field(default=None, examples=["your.email@domain.com"])
+    last_update: datetime = Field(default_factory=datetime_now_utc, exclude=True)
 
 
 class NewUser(BaseRequest):
@@ -59,20 +62,20 @@ class UnityTypeDTO(BaseRequest):
 class DefaultProductDTO(BaseRequest):
     unit_type_id: uuid.UUID
     category_id: uuid.UUID
-    image_url: str
+    image_url: str = ""
 
 
 class MarketDTO(BaseUserPropertyDTO):
     pass
 
 
-class UserCategorysDTO(BaseUserPropertyDTO):
+class UserCategoryDTO(BaseUserPropertyDTO):
     pass
 
 
 class UserProductsDTO(BaseUserPropertyDTO):
     unity_types_id: uuid.UUID
-    price: float
+    price: float = 0.0
     price_unity_types_id: uuid.UUID
     category_id: uuid.UUID
     notes: str
@@ -82,20 +85,20 @@ class UserProductsDTO(BaseUserPropertyDTO):
 
 class ShoppingListDTO(BaseUserPropertyDTO):
     final_value: float
-    unique_items: int
-    total_items: int
+    unique_items: int = 0
+    total_items: int = 0
 
 
 class ShoppingLogDTO(BaseUserPropertyDTO):
     shopping_list_id: uuid.UUID
     market_id: uuid.UUID
-    buy_date: date
+    buy_date: date = Field(default_factory=date.today)
 
 
 class ProductListDTO(BaseRequest):
     shopping_list_id: uuid.UUID
     user_product_id: uuid.UUID
-    quantity: int
-    price: float
-    total: float = 0
+    quantity: int = 0
+    price: float = 0.0
+    total: float = 0.0
     on_cart: bool = False
