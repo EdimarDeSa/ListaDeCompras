@@ -46,6 +46,11 @@ class UserRoutes(BaseRoutes):
         service = self._create_service()
 
         try:
+
+            # TODO: Implementar verificação de perfil
+            # if current_user.perfil.name != "ADMIN":
+            #     raise InternalErrors.FORBIDDEN_403(ResponseCode.FORBIDDEN_ADMIN_ACCESS, language)
+
             users_dto = service.read_all(language)
 
             content = BaseContent(data=users_dto)
@@ -60,7 +65,6 @@ class UserRoutes(BaseRoutes):
         service = self._create_service()
 
         if request.headers.get("Authorization", None) is not None:
-            print(request.headers["Authorization"])
             content = BaseContent(rc=ResponseCode.ALREADY_LOGGED)
             return BaseResponse(status_code=st.HTTP_403_FORBIDDEN, content=content)
 
@@ -98,11 +102,10 @@ class UserRoutes(BaseRoutes):
         current_user: Annotated[TokenData, Depends(decode_token)],
     ) -> BaseResponse:
         service = self._create_service()
-        user_id = current_user.id
 
         try:
 
-            service.delete_user_by_id(user_id, current_user.language)
+            service.delete_user_by_id(current_user.id, current_user.language)
 
             content = BaseContent(data="User deleted")
             return BaseResponse(status_code=st.HTTP_202_ACCEPTED, content=content)

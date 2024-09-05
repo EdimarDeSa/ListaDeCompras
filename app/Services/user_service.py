@@ -64,6 +64,8 @@ class UserService(BaseService):
 
             self._logger.debug(f"User created: {user}")
 
+            self.active_user(db_session, user.id, language)
+
             db_session.commit()
 
             return user
@@ -129,3 +131,22 @@ class UserService(BaseService):
 
     def _create_db_session(self) -> scoped_session[Session]:
         return DBConnectionHandler.create_session(db_url=get_db_url())
+
+    def active_user(self, db_session: scoped_session[Session], id_user: UUID, language: LangEnum) -> None:
+        # Coleta as categorias padrões
+        default_categories = self._def_cat_repository.get_all_default_categories(db_session, language)
+
+        # Registra as categorias para o usuário
+        self._user_cat_repository.create_default_user_categories(db_session, id_user, default_categories, language)
+
+        # Coleta todas as categorias do usuário
+        user_categories = self._user_cat_repository.get_all_user_categories(db_session, id_user, language)
+
+        # Coleta todos os produtos padrões
+        default_products = self._def_prod_repository.get_all_default_products(db_session, language)
+
+        # Registra produtos para o usuário
+        self._user_prod_repository.create_default_user_products(
+            db_session, id_user, default_products, user_categories, language
+        )
+        pass
