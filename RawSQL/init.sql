@@ -72,7 +72,50 @@ EXECUTE FUNCTION update_last_update_column();
 -- Tabela de market
 CREATE TABLE IF NOT EXISTS market (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    name VARCHAR(255) NOT NULL UNIQUE,
+    name VARCHAR(255) NOT NULL,
+    user_id UUID NOT NULL REFERENCES "user"(id) ON DELETE CASCADE,
     creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     last_update TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    CONSTRAINT unique_market_per_user UNIQUE (name, user_id)
 );
+
+CREATE TRIGGER update_market_last_update
+BEFORE UPDATE ON market
+FOR EACH ROW
+EXECUTE FUNCTION update_last_update_column();
+
+-- Tabela user category
+CREATE TABLE IF NOT EXISTS user_category (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name VARCHAR(100) NOT NULL,
+    user_id UUID NOT NULL REFERENCES "user"(id) ON DELETE CASCADE,
+    creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    last_update TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    CONSTRAINT unique_category_per_user UNIQUE (name, user_id)
+);
+
+CREATE TRIGGER update_user_category_last_update
+BEFORE UPDATE ON user_category
+FOR EACH ROW
+EXECUTE FUNCTION update_last_update_column();
+
+-- Tabela user product
+CREATE TABLE IF NOT EXISTS user_product (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name VARCHAR(100) NOT NULL,
+    unity_types_id UUID NOT NULL REFERENCES unity_type(id) ON DELETE CASCADE,
+    price MONEY NOT NULL,
+    price_unity_types_id UUID NOT NULL REFERENCES unity_type(id) ON DELETE CASCADE,
+    category_id UUID NOT NULL REFERENCES user_category(id) ON DELETE CASCADE,
+    notes TEXT,
+    barcode VARCHAR(50),
+    image_url TEXT,
+    user_id UUID NOT NULL REFERENCES "user"(id) ON DELETE CASCADE,
+    creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    last_update TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+CREATE TRIGGER update_user_product_last_update
+BEFORE UPDATE ON user_product
+FOR EACH ROW
+EXECUTE FUNCTION update_last_update_column();
