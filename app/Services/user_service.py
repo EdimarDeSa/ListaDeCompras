@@ -60,7 +60,7 @@ class UserService(BaseService):
         try:
             self._validator.validate_new_user(db_session, new_user, language)
 
-            user = self._repository.create_user(db_session, new_user)
+            user = self._repository.create_user(db_session, new_user, language)
 
             self._logger.debug(f"User created: {user}")
 

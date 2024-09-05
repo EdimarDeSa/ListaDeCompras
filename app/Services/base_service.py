@@ -9,6 +9,10 @@ from app.Validators.base_validator import BaseValidator
 
 class BaseService(ABC):
     @abstractmethod
+    def __init__(self) -> None:
+        pass
+
+    @abstractmethod
     def _create_db_session(self) -> scoped_session[Session]:
         pass
 

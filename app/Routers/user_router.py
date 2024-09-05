@@ -1,4 +1,3 @@
-import uuid
 from typing import Optional, Annotated
 
 from fastapi import Request, status as st, Depends
@@ -37,7 +36,7 @@ class UserRoutes(BaseRoutes):
         try:
             user_dto = service.read_by_id(current_user.id, current_user.language)
 
-            content = BaseContent(rc=ResponseCode.OK, data=user_dto)
+            content = BaseContent(data=user_dto)
             return BaseResponse(status_code=st.HTTP_200_OK, content=content)
 
         except Exception as e:
@@ -49,25 +48,7 @@ class UserRoutes(BaseRoutes):
         try:
             users_dto = service.read_all(language)
 
-            content = BaseContent(rc=ResponseCode.OK, data=users_dto)
-            return BaseResponse(status_code=st.HTTP_200_OK, content=content)
-
-        except Exception as e:
-            return self.return_exception(e)
-
-    async def get_user_by_id(
-        self,
-        request: Request,
-        current_user: Annotated[TokenData, Depends(decode_token)],
-        user_id: uuid.UUID,
-        language: Optional[LangEnum] = LangEnum.EN,
-    ) -> BaseResponse:
-        service = self._create_service()
-
-        try:
-            user_dto = service.read_by_id(user_id, language)
-
-            content = BaseContent(rc=ResponseCode.OK, data=user_dto)
+            content = BaseContent(data=users_dto)
             return BaseResponse(status_code=st.HTTP_200_OK, content=content)
 
         except Exception as e:
@@ -86,7 +67,7 @@ class UserRoutes(BaseRoutes):
 
             user_dto: UserDTO = service.create_user(new_user, language)
 
-            content = BaseContent(rc=ResponseCode.OK, data=user_dto)
+            content = BaseContent(data=user_dto)
             return BaseResponse(status_code=st.HTTP_201_CREATED, content=content)
 
         except Exception as e:
@@ -104,7 +85,7 @@ class UserRoutes(BaseRoutes):
             language = current_user.language
             updated_data = service.update_user(user_id, update_data, language)
 
-            content = BaseContent(rc=ResponseCode.OK, data=updated_data)
+            content = BaseContent(data=updated_data)
             return BaseResponse(status_code=st.HTTP_202_ACCEPTED, content=content)
 
         except Exception as e:
@@ -122,7 +103,7 @@ class UserRoutes(BaseRoutes):
 
             service.delete_user_by_id(user_id, current_user.language)
 
-            content = BaseContent(rc=ResponseCode.OK, data="User deleted")
+            content = BaseContent(data="User deleted")
             return BaseResponse(status_code=st.HTTP_202_ACCEPTED, content=content)
 
         except Exception as e:

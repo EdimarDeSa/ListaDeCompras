@@ -12,13 +12,14 @@ logger = logging.getLogger(__name__)
 
 
 app = FastAPI(
-    title="Lista de compras",
+    title="Mundo de compras",
     debug=DEBUG_MODE,
     docs_url="/docs",
     contact={"name": "Edimar de Sá", "email": "edimar.sa@efscode.com"},
 )
 
 
+# Registra todos os middlewares listados
 for middleware in middlewares:
     if "http" in middleware.get("options", False):
         app.middleware("http")(middleware["middleware_class"])

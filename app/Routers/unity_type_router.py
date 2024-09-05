@@ -1,41 +1,42 @@
-import uuid
-from typing import Optional
+from fastapi import Request
 
-from app.DataBase.models.dto_models import UnityTypeDTO
+from app.Enums.enums import LangEnum
 from app.Routers.base_router import BaseRoutes
+from app.Schemas.responses.base_response import BaseResponse, BaseContent
+from app.Services.unity_type_service import UnityTypeService
 
 
 class UnityTypeRoutes(BaseRoutes):
     def __init__(self) -> None:
-        super().__init__(prefix="/unity_types")
+        self.api_router = self.create_api_router(prefix="/unity_types", tags=["Unity type"])
         self.__register_routes()
 
     def __register_routes(self) -> None:
         # GET
-        self.add_api_route("/all", self.get_all_unity_types, methods=[HttpMethodsEnum.GET])
-        self.add_api_route("/1/{unity_type_id}", self.get_unity_type_by_id, methods=[HttpMethodsEnum.GET])
-        self.add_api_route("/name/{unity_type_name}", self.get_unity_type_by_name, methods=[HttpMethodsEnum.GET])
+        self.api_router.add_api_route("/all", self.get_all_unity_types, methods=["GET"])
+        self.api_router.add_api_route("/name/{unity_type_name}", self.get_unity_type_by_name, methods=["GET"])
 
-    async def get_all_unity_types(self, language: Optional[LangEnum] = None) -> list[UnityTypeDTO]:
-        unity_types = self.db_conn.read_all_unity_types()
+    async def get_all_unity_types(self, request: Request, language: LangEnum) -> BaseResponse:
+        service = self._create_service()
 
-        if unity_types is None:
-            raise HttpExceptions.UserNotFound(language)
+        try:
+            unity_types = service.read_all(language=language)
+            content = BaseContent(data=unity_types)
+            return BaseResponse(content=content)
 
-        return unity_types
+        except Exception as e:
+            return self.return_exception(e)
 
-    async def get_unity_type_by_id(self, unity_type_id: uuid.UUID, language: Optional[LangEnum] = None) -> UnityTypeDTO:
-        unity_type = self.db_conn.read_unity_type_by_id(unity_type_id)
+    async def get_unity_type_by_name(self, request: Request, unity_type_name: str, language: LangEnum) -> BaseResponse:
+        service = self._create_service()
 
-        if unity_type is None:
-            raise HttpExceptions.UserNotFound(language)
+        try:
+            unity_type = service.read_by_name(unity_type_name, language)
+            content = BaseContent(data=unity_type)
+            return BaseResponse(content=content)
 
-        return unity_type
+        except Exception as e:
+            return self.return_exception(e)
 
-    async def get_unity_type_by_name(self, unity_type_name: str, language: Optional[LangEnum] = None) -> UnityTypeDTO:
-        unity_type = self.db_conn.read_unity_type_by_name(unity_type_name)
-
-        if unity_type is None:
-            raise HttpExceptions.UserNotFound(language)
-
-        return unity_type
+    def _create_service(self) -> UnityTypeService:
+        return UnityTypeService()

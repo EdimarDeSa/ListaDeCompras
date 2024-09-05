@@ -2,13 +2,12 @@ import re
 from logging import Logger
 
 import email_validator
-from fastapi import status as st
 from passlib.context import CryptContext
 from sqlalchemy.orm import scoped_session, Session
 
 from app.DataBase.models.dto_models import NewUser, UpdateUserDTO
 from app.Enums.enums import LangEnum, ResponseCode
-from app.InternalResponse.base_internal_response import BaseInternalResponses
+from app.InternalResponse.internal_errors import InternalErrors
 from app.Validators.base_validator import BaseValidator
 
 
@@ -78,21 +77,17 @@ class UserValidator(BaseValidator):
         return Logger(__name__)
 
     def raise_error(self, error: ResponseCode, language: LangEnum) -> None:
-        raise BaseInternalResponses(
-            rc=error,
-            language=language,
-            status_code=st.HTTP_400_BAD_REQUEST,
-        )
+        raise InternalErrors.BAD_REQUEST_400(error, language)
 
     def verify_password_hash(self, password: str, hashed_password: str, language: LangEnum) -> None:
         is_valid = self._pwd_context.verify(secret=password, hash=hashed_password)
 
         if is_valid is False:
-            raise BaseInternalResponses(
-                rc=ResponseCode.INVALID_CREDENTIALS,
-                language=language,
-                status_code=st.HTTP_400_BAD_REQUEST,
-            )
+            raise InternalErrors.FORBIDDEN_403(ResponseCode.INVALID_CREDENTIALS, language)
 
     def hash_password(self, password: str) -> str:
         return self._pwd_context.hash(secret=password)
+
+    def validate_user_active(self, is_active: bool, language: LangEnum) -> None:
+        if is_active is False:
+            raise InternalErrors.FORBIDDEN_403(ResponseCode.USER_NOT_ACTIVE, language)

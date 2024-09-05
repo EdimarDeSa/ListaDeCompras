@@ -30,6 +30,7 @@ class UserLoginDTO(BaseModel):
     password: str
     email: str = Field(examples=["your.email@domain.com"])
     language: LangEnum = LangEnum.EN
+    is_active: bool
 
 
 class UpdateUserDTO(BaseModel):
@@ -57,12 +58,6 @@ class DefaultCategoryDTO(BaseRequest):
 
 class UnityTypeDTO(BaseRequest):
     base_calc: int = 1
-
-
-class DefaultProductDTO(BaseRequest):
-    unit_type_id: uuid.UUID
-    category_id: uuid.UUID
-    image_url: str = ""
 
 
 class MarketDTO(BaseUserPropertyDTO):

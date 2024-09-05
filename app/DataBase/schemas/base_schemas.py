@@ -17,10 +17,7 @@ class BaseSchema(DeclarativeBase):
     name: Mapped[str] = MappedColumn(String(length=100), nullable=False)
     creation: Mapped[datetime] = MappedColumn(DateTime, default=datetime_now_utc, nullable=False)
     last_update: Mapped[datetime] = MappedColumn(
-        DateTime,
-        default=datetime_now_utc,
-        nullable=False,
-        onupdate=datetime_now_utc,
+        DateTime, default=datetime_now_utc, nullable=False, onupdate=datetime_now_utc
     )
 
     def __repr__(self) -> str:

@@ -33,16 +33,13 @@ class AuthService(BaseService):
         self._logger.info("Starting authenticate_user")
 
         try:
-            user: UserLoginDTO = self._repository.read_by_email(
-                db_session=self._db_session,
-                user_email=user_email,
-                to_login=True,
-                language=language,
-            )
+            user: UserLoginDTO = self._repository.read_by_email(self._db_session, user_email, True, language)
 
-            self._validator.verify_password_hash(password=password, hashed_password=user.password, language=language)
+            self._validator.validate_user_active(user.is_active, language)
 
-            token = self.create_access_token(user=user)
+            self._validator.verify_password_hash(password, user.password, language)
+
+            token = self.create_access_token(user)
             return token
 
         except Exception as e:

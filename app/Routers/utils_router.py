@@ -1,4 +1,5 @@
 from fastapi import status as st, Request
+from starlette.responses import RedirectResponse
 
 from app.DataBase.models.version_model import VersionModel
 from app.Enums.enums import ResponseCode, LangEnum
@@ -17,6 +18,7 @@ class UtilsRoutes(BaseRoutes):
     def register_routes(self):
         self._router.add_api_route("/health", self.health, methods=["GET"])
         self._router.add_api_route("/version", self.version, methods=["GET"])
+        self._router.add_api_route("/", self.home, methods=["GET"])
 
     def health(self, request: Request) -> BaseResponse:
         try:
@@ -37,6 +39,10 @@ class UtilsRoutes(BaseRoutes):
 
         except Exception as e:
             self.return_exception(e)
+
+    def home(self, request: Request) -> RedirectResponse:
+        # Redirect to Swagger docs
+        return RedirectResponse(url="/docs")
 
     def _create_service(self) -> UtilsService:
         return UtilsService()

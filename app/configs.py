@@ -7,6 +7,9 @@ from starlette.middleware.cors import CORSMiddleware
 from app.Middlewares.process_time import add_process_time_header
 from app.Routers.auth_router import AuthRoutes
 from app.Routers.base_router import BaseRoutes
+from app.Routers.defaullt_products_router import DefaultProductsRoutes
+from app.Routers.default_category_router import DefaultCategoryRoutes
+from app.Routers.unity_type_router import UnityTypeRoutes
 from app.Routers.user_router import UserRoutes
 from app.Routers.utils_router import UtilsRoutes
 
@@ -21,8 +24,9 @@ routers: list[type[BaseRoutes]] = [
     AuthRoutes,
     UserRoutes,
     UtilsRoutes,
-    # UnityTypeRouter,
-    # DefaultCategoryRouter,
+    UnityTypeRoutes,
+    DefaultCategoryRoutes,
+    DefaultProductsRoutes,
 ]
 
 

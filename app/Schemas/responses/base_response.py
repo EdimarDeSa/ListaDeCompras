@@ -15,7 +15,7 @@ class BaseResponse(Response):
     def __init__(
         self,
         *,
-        status_code: int,
+        status_code: int = 200,
         content: BaseContent,
         headers: Optional[Mapping[str, str]] = None,
         media_type: Optional[str] = "application/json",

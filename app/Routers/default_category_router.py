@@ -1,7 +1,9 @@
-from typing import Optional
+from fastapi import Request
 
-from app.DataBase.models.dto_models import DefaultCategoryDTO
+from app.Enums.enums import LangEnum
 from app.Routers.base_router import BaseRoutes
+from app.Schemas.responses.base_response import BaseResponse, BaseContent
+from app.Services.default_category_service import DefaultCategoryService
 
 
 class HttpExceptions:
@@ -9,18 +11,25 @@ class HttpExceptions:
 
 
 class DefaultCategoryRoutes(BaseRoutes):
+
     def __init__(self) -> None:
-        super().__init__(prefix="/default_categorys")
+        self.api_router = self.create_api_router(prefix="/default_category", tags=["Default category"])
         self.__register_routes()
 
     def __register_routes(self) -> None:
         # GET
-        self.add_api_route("/all", self.get_all_default_categorys, methods=[HttpMethodsEnum.GET])
+        self.api_router.add_api_route("/all", self.get_all_default_categories, methods=["GET"])
 
-    async def get_all_default_categorys(self, language: Optional[LangEnum] = None) -> list[DefaultCategoryDTO]:
-        default_categorys = self.db_conn.read_all_default_categorys()
+    async def get_all_default_categories(self, request: Request, language: LangEnum) -> BaseResponse:
+        service = self._create_service()
 
-        if default_categorys is None:
-            raise HttpExceptions.UserNotFound(language)
+        try:
+            default_categories = service.read_all(language)
 
-        return default_categorys
+            content = BaseContent(data=default_categories)
+            return BaseResponse(status_code=200, content=content)
+        except Exception as e:
+            raise self.return_exception(e)
+
+    def _create_service(self) -> DefaultCategoryService:
+        return DefaultCategoryService()
