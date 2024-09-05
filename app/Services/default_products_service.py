@@ -36,6 +36,7 @@ class DefaultProductsService(BaseService):
         db_session = self._create_db_session()
 
         try:
+            print(new_product)
             self._validator.validate_new_default_product(db_session, new_product, language)
             self._logger.debug("Product validated")
 

@@ -15,5 +15,5 @@ class TokenData(BaseModel):
     id: UUID
     email: str = Field(examples=["your.email@domain.com"])
     is_active: bool = True
-    language: LangEnum = LangEnum.EN
+    language: LangEnum = LangEnum.EN_US
     expires_at: Optional[int] = Field(default=None, alias="exp")

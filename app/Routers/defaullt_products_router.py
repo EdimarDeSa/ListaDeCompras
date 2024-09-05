@@ -45,6 +45,7 @@ class DefaultProductsRoutes(BaseRoutes):
     ) -> BaseResponse:
         service = self._create_service()
 
+        # TODO: Implementar verificação de perfil
         # if current_user.perfil.name != "ADMIN":
         #     raise InternalErrors.FORBIDDEN_403(ResponseCode.FORBIDDEN_ADMIN_ACCESS, language)
 

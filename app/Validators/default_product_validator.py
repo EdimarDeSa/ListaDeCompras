@@ -43,8 +43,8 @@ class DefaultProductValidator(BaseValidator):
     ) -> None:
         self._logger.debug(f"Searching for {unit_type_name}")
         query = self.query.select_unity_type_by_name(unit_type_name)
-        result = db_session.execute(query).first()
-        self._logger.debug(f"Founded {result[0]}")
+        result = db_session.execute(query).scalars().first()
+        self._logger.debug(f"Founded {result}")
 
         if result is None:
             self.raise_error(ResponseCode.INVALID_UNIT_TYPE, language)

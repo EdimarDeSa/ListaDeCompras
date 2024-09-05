@@ -20,7 +20,7 @@ class MsgLoader:
                 cls.__messages = json.load(file)
 
     @classmethod
-    def get_message(cls, rc: ResponseCode, language: str = LangEnum.EN) -> str:
+    def get_message(cls, rc: ResponseCode, language: str = LangEnum.EN_US) -> str:
         cls._load_messages()
         language_dict = cls.__messages.get(language, {})
         message = language_dict.get(rc.name, rc.name)

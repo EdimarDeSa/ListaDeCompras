@@ -15,7 +15,7 @@ class BaseUserPropertyDTO(BaseRequest):
 
 class UserDTO(BaseRequest):
     email: str = Field(examples=["your.email@domain.com"])
-    language: LangEnum = LangEnum.EN
+    language: LangEnum = LangEnum.EN_US
     birthdate: date
 
     def __eq__(self, other: "UserDTO") -> bool:
@@ -29,7 +29,7 @@ class UserLoginDTO(BaseModel):
     name: str
     password: str
     email: str = Field(examples=["your.email@domain.com"])
-    language: LangEnum = LangEnum.EN
+    language: LangEnum = LangEnum.EN_US
     is_active: bool
 
 
@@ -48,7 +48,7 @@ class UpdateUserEmailDTO(BaseModel):
 class NewUser(BaseRequest):
     password: str = Field(examples=["P@s5W0rD"])
     email: str = Field(examples=["your.email@domain.com"])
-    language: LangEnum = LangEnum.EN
+    language: LangEnum = LangEnum.PT_BR
     birthdate: date
 
 

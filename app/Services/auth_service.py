@@ -77,7 +77,7 @@ class AuthService(BaseService):
             current_user = TokenData.model_validate(payload)
 
             if current_user.is_active is False:
-                raise InternalErrors.UNAUTHORIZED_401(ResponseCode.INVALID_CREDENTIALS, LangEnum.EN)
+                raise InternalErrors.UNAUTHORIZED_401(ResponseCode.INVALID_CREDENTIALS, LangEnum.EN_US)
 
             return current_user
         except Exception as e:

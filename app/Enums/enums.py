@@ -1,9 +1,9 @@
-from enum import StrEnum, IntEnum
+from enum import IntEnum, StrEnum
 
 
 class LangEnum(StrEnum):
-    PT_BR = "Pt_Br"
-    EN = "En"
+    PT_BR = "PT_BR"
+    EN_US = "EN_US"
 
 
 class ResponseCode(IntEnum):

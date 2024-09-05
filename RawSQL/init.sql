@@ -11,7 +11,7 @@ $$ LANGUAGE plpgsql;
 CREATE TABLE IF NOT EXISTS "user" (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR(100) NOT NULL,
-    language VARCHAR(25) NOT NULL,
+    language VARCHAR(5) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     password VARCHAR(80) NOT NULL,
     birthdate DATE NOT NULL,

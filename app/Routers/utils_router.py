@@ -22,7 +22,7 @@ class UtilsRoutes(BaseRoutes):
 
     def health(self, request: Request) -> BaseResponse:
         try:
-            result = self._service.check_health(LangEnum.EN)
+            result = self._service.check_health(LangEnum.EN_US)
 
             content = BaseContent(rc=0, data=result.message)
             return BaseResponse(status_code=200, content=content)

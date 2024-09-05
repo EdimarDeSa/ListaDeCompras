@@ -26,3 +26,7 @@ INSERT INTO unity_type ("name", abbreviation, "base_calc") VALUES
 ('Caixa', 'Cx', 1),
 ('Bandeja', 'Bdj', 1);
 
+SELECT * FROM language;
+INSERT INTO language ("name") VALUES
+('PT_BR'),
+('EN_US');

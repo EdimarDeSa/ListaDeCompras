@@ -23,7 +23,7 @@ class UserRoutes(BaseRoutes):
         # self.api_router.add_api_route("/{user_id}", self.get_user_by_id, methods=["GET"])
 
         # POST
-        self.api_router.add_api_route("/", self.post_new_user, methods=["POST"])
+        self.api_router.add_api_route("/", self.post_user, methods=["POST"])
 
         # PUT
         self.api_router.add_api_route("/", self.put_user, methods=["PUT"])
@@ -42,7 +42,7 @@ class UserRoutes(BaseRoutes):
         except Exception as e:
             return self.return_exception(e)
 
-    async def get_all_users(self, request: Request, language: Optional[LangEnum] = LangEnum.EN) -> BaseResponse:
+    async def get_all_users(self, request: Request, language: Optional[LangEnum] = LangEnum.EN_US) -> BaseResponse:
         service = self._create_service()
 
         try:
@@ -54,12 +54,13 @@ class UserRoutes(BaseRoutes):
         except Exception as e:
             return self.return_exception(e)
 
-    async def post_new_user(
-        self, request: Request, new_user: NewUser, language: Optional[LangEnum] = LangEnum.EN
+    async def post_user(
+        self, request: Request, new_user: NewUser, language: Optional[LangEnum] = LangEnum.EN_US
     ) -> BaseResponse:
         service = self._create_service()
 
-        if request.headers["Authorization"]:
+        if request.headers.get("Authorization", None) is not None:
+            print(request.headers["Authorization"])
             content = BaseContent(rc=ResponseCode.ALREADY_LOGGED)
             return BaseResponse(status_code=st.HTTP_403_FORBIDDEN, content=content)
 

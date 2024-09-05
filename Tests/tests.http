@@ -1,0 +1,14 @@
+### Create new user
+
+POST http://localhost:8000/users/ HTTP/1.1
+Content-Type: application/json
+
+{
+  "name": "Edimar de Sá",
+  "email": "edimar.sa@efscode.com",
+  "password": "698&eDOMASSsdwwD",
+  "birthdate": "2000-01-01",
+  "language": "PT_BR"
+}
+
+###

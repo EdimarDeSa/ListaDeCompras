@@ -47,7 +47,7 @@ class UserRepository(BaseRepository):
         db_session: scoped_session[Session],
         user_email: str,
         to_login: bool = False,
-        language: LangEnum = LangEnum.EN,
+        language: LangEnum = LangEnum.EN_US,
     ) -> UserDTO | UserLoginDTO:
         self.db_session = db_session
 

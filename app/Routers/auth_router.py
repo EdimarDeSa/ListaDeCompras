@@ -30,12 +30,20 @@ class AuthRoutes(BaseRoutes):
         self,
         request: Request,
         form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
-        language: Optional[LangEnum] = LangEnum.EN,
+        language: Optional[LangEnum] = LangEnum.EN_US,
     ) -> Token or BaseResponse:
+        """
+        Cria um novo token JWT para o usuário se as credenciais fornecidas forem válidas.
 
-        # if request.headers.get("Authorization"):
-        #     raise InternalErrors.FORBIDDEN_403(ResponseCode.ALREADY_LOGGED, language)
+        Attributes:
 
+            form_data (Annotated[OAuth2PasswordRequestForm, Depends()]): As credenciais fornecidas pelo usuário.
+            language (Optional[LangEnum], optional): Idioma da resposta. Defaults to LangEnum.EN_US.
+
+        Raises:
+
+            InternalErrors.UNAUTHORIZED_401: Se as credenciais fornecidas forem inválidas.
+        """
         user_email = form_data.username
         password = form_data.password
 
@@ -48,10 +56,18 @@ class AuthRoutes(BaseRoutes):
             return self.return_exception(e, headers={"WWW-Authenticate": "Bearer"})
 
     async def refresh_token(
-        self, request: Request, language: Optional[LangEnum] = LangEnum.EN
+        self, request: Request, language: Optional[LangEnum] = LangEnum.EN_US
     ) -> Token or BaseResponse:
         """
         Atualiza o token JWT se o token de atualização fornecido for válido.
+
+        Attributes:
+
+            language (Optional[LangEnum], optional): Idioma da resposta. Defaults to LangEnum.EN_US.
+
+        Raises:
+
+            InternalErrors.UNAUTHORIZED_401: Se as credenciais fornecidas forem inválidas.
         """
         try:
             refresh_token = request.headers.get("Authorization")

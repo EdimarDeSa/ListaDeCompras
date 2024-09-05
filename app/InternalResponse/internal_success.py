@@ -12,5 +12,5 @@ class InternalSuccess(Enum):
     ACCEPTED = st.HTTP_202_ACCEPTED
     NO_CONTENT = st.HTTP_204_NO_CONTENT
 
-    def __call__(self, language: LangEnum = LangEnum.EN) -> BaseInternalResponses:
+    def __call__(self, language: LangEnum = LangEnum.EN_US) -> BaseInternalResponses:
         return BaseInternalResponses(rc=ResponseCode.OK, language=language, status_code=self.value)
