@@ -1,5 +1,5 @@
+import logging
 from abc import ABC, abstractmethod
-from logging import Logger
 
 from sqlalchemy.orm import scoped_session, Session
 
@@ -24,6 +24,6 @@ class BaseService(ABC):
     def _create_validator(self) -> type[BaseValidator]:
         pass
 
-    @abstractmethod
-    def _create_logger(self) -> Logger:
-        pass
+    @staticmethod
+    def _create_logger(name: str) -> logging.Logger:
+        return logging.getLogger(name)

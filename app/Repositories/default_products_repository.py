@@ -20,7 +20,7 @@ class DefaultProductsRepository(BaseRepository):
         self.db_session = db_session
 
         try:
-            query = self.query.select_all_default_products()
+            query = self._query.select_all_default_products()
 
             result = self.db_session.execute(query).all()
 
@@ -42,7 +42,7 @@ class DefaultProductsRepository(BaseRepository):
             cleaned_data = self._prepare_data_to_insert(new_product)
             self._logger.debug("Product prepared successfully")
 
-            query = self.query.insert_default_product(**cleaned_data)
+            query = self._query.insert_default_product(**cleaned_data)
 
             self.db_session.execute(query)
             self.db_session.flush()
@@ -55,12 +55,12 @@ class DefaultProductsRepository(BaseRepository):
         cleaned_data: dict[str, Any] = new_product.model_dump()
 
         self._logger.debug(f"Searching for unity type where name = {new_product.unit_type_name}")
-        query = self.query.select_unity_type_by_name(new_product.unit_type_name)
+        query = self._query.select_unity_type_by_name(new_product.unit_type_name)
         result = self.db_session.execute(query).first()
         cleaned_data["unit_type_id"] = result.UnityType.id
 
         self._logger.debug(f"Searching for default category where name = {new_product.default_category_name}")
-        query = self.query.select_default_category_by_name(new_product.default_category_name)
+        query = self._query.select_default_category_by_name(new_product.default_category_name)
         result = self.db_session.execute(query).first()
         cleaned_data["default_category_id"] = result.DefaultCategory.id
 

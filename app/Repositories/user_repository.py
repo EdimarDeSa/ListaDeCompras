@@ -3,19 +3,24 @@ from uuid import UUID
 from sqlalchemy.orm import Session, scoped_session
 
 from app.DataBase.models.dto_models import UserDTO, NewUser, UpdateUserDTO, UserLoginDTO
+from app.DataBase.querys import Query
+from app.DataBase.schemas.user_schema import User
 from app.Enums.enums import LangEnum, ResponseCode
 from app.InternalResponse.internal_errors import InternalErrors
 from app.Repositories.base_repository import BaseRepository
 
 
 class UserRepository(BaseRepository):
+    def __init__(self):
+        self._query = Query()
+        self._logger = self.create_logger(__name__)
+
     def read_all(self, db_session: scoped_session[Session], language: LangEnum) -> list[UserDTO]:
-        self.db_session = db_session
-
         try:
-            query = self.query.select_all_users()
+            self._logger.debug("Starting read_all")
+            query = self._query.select_all_users()
 
-            result = self.db_session.execute(query).all()
+            result = db_session.execute(query).all()
 
             if result is None:
                 raise InternalErrors.NOT_FOUND_404(rc=ResponseCode.USER_NOT_FOUND, language=language)
@@ -27,14 +32,15 @@ class UserRepository(BaseRepository):
 
     # noinspection PyTypeChecker
     def read_by_id(self, db_session: scoped_session[Session], user_id: UUID, language: LangEnum) -> UserDTO:
-        self.db_session = db_session
-
         try:
-            query = self.query.select_user_by_id(user_id)
+            self._logger.debug(f"Searching user with id - '{user_id}' - in table - '{User.__tablename__}'")
+            query = self._query.select_user_by_id(user_id)
 
-            result = self.db_session.execute(query).first()  # type: ignore
+            result = db_session.execute(query).first()  # type: ignore
+            self._logger.debug(f"User found - {result.id}")
 
             if result is None:
+                self._logger.debug("User not found")
                 raise InternalErrors.NOT_FOUND_404(rc=ResponseCode.USER_NOT_FOUND, language=language)
 
             return UserDTO.model_validate(result.User)
@@ -49,31 +55,34 @@ class UserRepository(BaseRepository):
         to_login: bool = False,
         language: LangEnum = LangEnum.EN_US,
     ) -> UserDTO | UserLoginDTO:
-        self.db_session = db_session
-
         try:
-            query = self.query.select_user_by_email(user_email)
+            self._logger.debug(f"Searching user with email - '{user_email}' - in table - '{User.__tablename__}'")
+            query = self._query.select_user_by_email(user_email)
 
-            result = self.db_session.execute(query).first()
+            result: User = db_session.execute(query).scalars().first()
+            self._logger.debug(f"User found - {result.id}")
 
             if result is None:
+                self._logger.debug("User not found")
                 raise InternalErrors.NOT_FOUND_404(rc=ResponseCode.USER_NOT_FOUND, language=language)
 
             if to_login:
-                return UserLoginDTO.model_validate(result.User)
-            return UserDTO.model_validate(result.User)
+                model = UserLoginDTO
+            else:
+                model = UserDTO
+            self._logger.debug(f"Model selected: {model.__name__}")
+
+            return model.model_validate(result)
 
         except Exception as e:
             self.return_db_error(e, language)
 
     def create_user(self, db_session: scoped_session[Session], new_user: NewUser, language: LangEnum) -> UserDTO:
-        self.db_session = db_session
-
         try:
-            query = self.query.insert_user(**new_user.model_dump())
+            query = self._query.insert_user(**new_user.model_dump())
 
-            self.db_session.execute(query)
-            self.db_session.flush()
+            db_session.execute(query)
+            db_session.flush()
 
             return UserDTO.model_validate(new_user)
 
@@ -83,14 +92,12 @@ class UserRepository(BaseRepository):
     def update_user(
         self, db_session: scoped_session[Session], user_id: UUID, update_data: UpdateUserDTO, language: LangEnum
     ) -> UpdateUserDTO:
-        self.db_session = db_session
-        cleaned_data = self._clean_update_data(update_data)
-
         try:
-            query = self.query.update_user_by_id(user_id, **cleaned_data)
+            cleaned_data = update_data.model_dump(exclude_none=True)
+            query = self._query.update_user_by_id(user_id, **cleaned_data)
 
-            self.db_session.execute(query)
-            self.db_session.flush()
+            db_session.execute(query)
+            db_session.flush()
 
             return UpdateUserDTO.model_validate(cleaned_data)
 
@@ -98,17 +105,11 @@ class UserRepository(BaseRepository):
             self.return_db_error(e, language)
 
     def delete_user_by_id(self, db_session: scoped_session[Session], user_id: UUID, language: LangEnum) -> None:
-        self.db_session = db_session
-
         try:
-            query = self.query.delete_user_by_id(user_id)
+            query = self._query.delete_user_by_id(user_id)
 
-            self.db_session.execute(query)
-            self.db_session.flush()
+            db_session.execute(query)
+            db_session.flush()
 
         except Exception as e:
             self.return_db_error(e, language)
-
-    @staticmethod
-    def _clean_update_data(update_data: UpdateUserDTO) -> dict[str, UUID | str]:
-        return {key: value for key, value in update_data if value is not None}

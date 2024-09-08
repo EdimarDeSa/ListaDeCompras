@@ -1,3 +1,4 @@
+import logging
 from abc import ABC, abstractmethod
 
 from fastapi import APIRouter
@@ -18,6 +19,14 @@ class BaseRoutes(ABC):
         pass
 
     @staticmethod
+    def create_logger(name: str) -> logging.Logger:
+        return logging.getLogger(name)
+
+    @staticmethod
+    def create_api_router(**kwargs) -> APIRouter:
+        return APIRouter(**kwargs)
+
+    @staticmethod
     def return_exception(e: Exception, **kwargs) -> BaseResponse:
         if isinstance(e, BaseInternalResponses):
             content = BaseContent(rc=e.rc, data=e.message)
@@ -25,10 +34,6 @@ class BaseRoutes(ABC):
 
         content = BaseContent(rc=ResponseCode.UNKNOWN_ERROR)
         return BaseResponse(status_code=st.HTTP_500_INTERNAL_SERVER_ERROR, content=content, **kwargs)
-
-    @staticmethod
-    def create_api_router(**kwargs) -> APIRouter:
-        return APIRouter(**kwargs)
 
     @property
     def api_router(self):

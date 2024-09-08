@@ -54,19 +54,20 @@ logger = logging.getLogger(__name__)
 
 
 if DEBUG_MODE:
-    log_file = os.getenv("LOG_FILE", "app.log")
     log_format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 
     logging.basicConfig(level=logging.DEBUG if DEBUG_MODE else logging.WARNING, format=log_format)
 
-    rotating_handler = RotatingFileHandler(log_file, maxBytes=2000, backupCount=5)
-    rotating_handler.setFormatter(logging.Formatter(log_format))
-
     if not logger.handlers:
-        console_handler = logging.StreamHandler()
-        console_handler.setFormatter(logging.Formatter(log_format))
+        log_formater = logging.Formatter(log_format)
 
+        console_handler = logging.StreamHandler()
+        console_handler.setFormatter(log_formater)
         logger.addHandler(console_handler)
+
+        log_file = os.getenv("LOG_FILE", "app.log")
+        rotating_handler = RotatingFileHandler(log_file, maxBytes=2000, backupCount=5)
+        rotating_handler.setFormatter(log_formater)
         logger.addHandler(rotating_handler)
 
-    logger.info("Logger configured")
+    logger.info("Logger activated!")

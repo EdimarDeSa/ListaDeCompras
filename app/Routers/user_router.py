@@ -13,14 +13,13 @@ from app.Services.user_service import UserService
 
 class UserRoutes(BaseRoutes):
     def __init__(self) -> None:
+        self._logger = self.create_logger(__name__)
         self.api_router = self.create_api_router(prefix="/users", tags=["Users"])
         self.__register_routes()
 
     def __register_routes(self) -> None:
         # GET
-        # self.api_router.add_api_route("/all", self.get_all_users, methods=["GET"])
         self.api_router.add_api_route("/me", self.get_me, methods=["GET"])
-        # self.api_router.add_api_route("/{user_id}", self.get_user_by_id, methods=["GET"])
 
         # POST
         self.api_router.add_api_route("/", self.post_user, methods=["POST"])
@@ -31,29 +30,18 @@ class UserRoutes(BaseRoutes):
         # DELETE
         self.api_router.add_api_route("/{user_email}", self.delete_user_when_logged, methods=["DELETE"])
 
-    async def get_me(self, request: Request, current_user: Annotated[TokenData, Depends(decode_token)]) -> BaseResponse:
+    async def get_me(
+        self,
+        request: Request,
+        current_user: Annotated[TokenData, Depends(decode_token)],
+    ) -> BaseResponse:
+        self._logger.debug("Starting get_me")
         service = self._create_service()
         try:
+            self._logger.debug("Starting read_by_id")
             user_dto = service.read_by_id(current_user.id, current_user.language)
 
             content = BaseContent(data=user_dto)
-            return BaseResponse(status_code=st.HTTP_200_OK, content=content)
-
-        except Exception as e:
-            return self.return_exception(e)
-
-    async def get_all_users(self, request: Request, language: Optional[LangEnum] = LangEnum.EN_US) -> BaseResponse:
-        service = self._create_service()
-
-        try:
-
-            # TODO: Implementar verificação de perfil
-            # if current_user.perfil.name != "ADMIN":
-            #     raise InternalErrors.FORBIDDEN_403(ResponseCode.FORBIDDEN_ADMIN_ACCESS, language)
-
-            users_dto = service.read_all(language)
-
-            content = BaseContent(data=users_dto)
             return BaseResponse(status_code=st.HTTP_200_OK, content=content)
 
         except Exception as e:

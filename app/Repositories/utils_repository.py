@@ -10,7 +10,7 @@ class UtilsRepository(BaseRepository):
         self.db_session = db_session
 
         try:
-            query = self.query.test_communication()
+            query = self._query.test_communication()
 
             result = self.db_session.execute(query).first()
 

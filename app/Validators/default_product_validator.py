@@ -1,5 +1,3 @@
-from logging import Logger, getLogger
-
 from sqlalchemy.orm import scoped_session, Session
 
 from app.DataBase.models.defualt_product_models import NewDefaultProduct
@@ -20,9 +18,6 @@ class DefaultProductValidator(BaseValidator):
         self.verify_if_default_unit_type_name_exists(db_session, new_product.unit_type_name, language)
         self.verify_if_default_category_name_exists(db_session, new_product.default_category_name, language)
 
-    def _create_logger(self) -> Logger:
-        return getLogger(__name__)
-
     def raise_error(self, error: ResponseCode, language: LangEnum) -> None:
         self._logger.exception(error)
         raise InternalErrors.BAD_REQUEST_400(error, language)
@@ -31,7 +26,7 @@ class DefaultProductValidator(BaseValidator):
         self, db_session: scoped_session[Session], name: str, language: LangEnum
     ) -> None:
 
-        query = self.query.select_default_product_by_name(name)
+        query = self._query.select_default_product_by_name(name)
 
         result = db_session.execute(query).first()
 
@@ -42,7 +37,7 @@ class DefaultProductValidator(BaseValidator):
         self, db_session: scoped_session[Session], unit_type_name: str, language: LangEnum
     ) -> None:
         self._logger.debug(f"Searching for {unit_type_name}")
-        query = self.query.select_unity_type_by_name(unit_type_name)
+        query = self._query.select_unity_type_by_name(unit_type_name)
         result = db_session.execute(query).scalars().first()
         self._logger.debug(f"Founded {result}")
 
@@ -52,7 +47,7 @@ class DefaultProductValidator(BaseValidator):
     def verify_if_default_category_name_exists(
         self, db_session: scoped_session[Session], category_name: str, language: LangEnum
     ) -> None:
-        query = self.query.select_default_category_by_name(category_name)
+        query = self._query.select_default_category_by_name(category_name)
 
         result = db_session.execute(query).first()
 

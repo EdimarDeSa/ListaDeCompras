@@ -11,7 +11,7 @@ class UnityTypeRepository(BaseRepository):
         self.db_session = db_session
 
         try:
-            query = self.query.select_all_unity_types()
+            query = self._query.select_all_unity_types()
 
             result = self.db_session.execute(query).all()
 
@@ -31,7 +31,7 @@ class UnityTypeRepository(BaseRepository):
         self.db_session = db_session
 
         try:
-            query = self.query.select_unity_type_by_name(unity_type_name)
+            query = self._query.select_unity_type_by_name(unity_type_name)
 
             result = self.db_session.execute(query).first()
 

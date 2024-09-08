@@ -11,6 +11,12 @@ from app.DataBase.schemas.user_schema import User
 
 
 class Query:
+
+    ### TEST ###
+    @staticmethod
+    def test_communication() -> TextClause[str]:
+        return text("SELECT 1")
+
     ### USER TABLE ###
     @staticmethod
     def select_all_users() -> Select[tuple[User]]:
@@ -35,11 +41,6 @@ class Query:
     @staticmethod
     def insert_user(**kwargs) -> Insert[User]:
         return insert(User).values(**kwargs)
-
-    ### TEST ###
-    @staticmethod
-    def test_communication() -> TextClause[str]:
-        return text("SELECT 1")
 
     ### UNITY TYPE TABLE ###
     @staticmethod
