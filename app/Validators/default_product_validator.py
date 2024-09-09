@@ -8,8 +8,8 @@ from app.Validators.base_validator import BaseValidator
 
 class DefaultProductValidator(BaseValidator):
     def __init__(self):
-        super(DefaultProductValidator, self).__init__()
-        self._logger = self._create_logger()
+        self._logger = self.create_logger(__name__)
+        self._query = self.create_query()
 
     def validate_new_default_product(
         self, db_session: scoped_session[Session], new_product: NewDefaultProduct, language: LangEnum

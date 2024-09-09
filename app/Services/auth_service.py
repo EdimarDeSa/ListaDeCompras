@@ -34,7 +34,7 @@ class AuthService(BaseService):
         try:
             self._logger.debug(f"Searching user - {user_email}")
             user: UserLoginDTO = self._repository.read_by_email(db_session, user_email, True, language)
-            self._logger.debug(f"User found - {user.id}")
+            self._logger.debug(f"User found - <result: {user}>")
 
             self._logger.debug(f"Validating user - {user.id}")
             self._validator.validate_user_active(user.is_active, language)

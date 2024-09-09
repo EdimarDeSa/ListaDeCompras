@@ -8,7 +8,9 @@ from app.Services.unity_type_service import UnityTypeService
 
 class UnityTypeRoutes(BaseRoutes):
     def __init__(self) -> None:
+        self._logger = self.create_logger(__name__)
         self.api_router = self.create_api_router(prefix="/unity_types", tags=["Unity type"])
+
         self.__register_routes()
 
     def __register_routes(self) -> None:
@@ -18,9 +20,13 @@ class UnityTypeRoutes(BaseRoutes):
 
     async def get_all_unity_types(self, request: Request, language: LangEnum) -> BaseResponse:
         service = self._create_service()
+        self._logger.info("Starting get_all_unity_types")
 
         try:
+            self._logger.debug("Trying to get all unity types")
             unity_types = service.read_all(language=language)
+            self._logger.info(f"Unity types found: {unity_types}")
+
             content = BaseContent(data=unity_types)
             return BaseResponse(content=content)
 

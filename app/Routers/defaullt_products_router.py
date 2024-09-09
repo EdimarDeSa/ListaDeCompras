@@ -14,6 +14,8 @@ from app.Services.default_products_service import DefaultProductsService
 
 class DefaultProductsRoutes(BaseRoutes):
     def __init__(self) -> None:
+        self._logger = self.create_logger(__name__)
+        self._service = self._create_service()
         self.api_router = self.create_api_router(prefix="/default_products", tags=["Default Products"])
         self.__register_routes()
 

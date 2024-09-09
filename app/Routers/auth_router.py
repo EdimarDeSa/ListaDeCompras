@@ -13,12 +13,10 @@ from app.Services.auth_service import AuthService
 
 class AuthRoutes(BaseRoutes):
     def __init__(self) -> None:
-        self.api_router = self.create_api_router(tags=["Auth"])
-        self._service = self._create_service()
         self._logger = self.create_logger(__name__)
+        self.api_router = self.create_api_router(tags=["Auth"])
 
         self.__register_routes()
-        self._logger.debug("Authentication routes created")
 
     def __register_routes(self) -> None:
         # POST
@@ -47,10 +45,11 @@ class AuthRoutes(BaseRoutes):
         """
         user_email = form_data.username
         password = form_data.password
+        service = self._create_service()
 
         try:
             self._logger.info(f"Starting login - {user_email}")
-            token_: Token = self._service.authenticate_user(user_email=user_email, password=password, language=language)
+            token_: Token = service.authenticate_user(user_email=user_email, password=password, language=language)
             self._logger.info(f"Success login - created token - {token_.access_token}")
             return token_
 
@@ -72,6 +71,8 @@ class AuthRoutes(BaseRoutes):
 
             InternalErrors.UNAUTHORIZED_401: Se as credenciais fornecidas forem inválidas.
         """
+        service = self._create_service()
+
         try:
             self._logger.info("Starting refresh token")
             refresh_token = request.headers.get("Authorization")
@@ -84,7 +85,7 @@ class AuthRoutes(BaseRoutes):
             self._logger.info(f"Refresh token without Bearer: {refresh_token}")
 
             self._logger.debug(f"Starting refresh token")
-            new_token: Token = self._service.refresh_jwt_token(refresh_token=refresh_token, language=language)
+            new_token: Token = service.refresh_jwt_token(refresh_token=refresh_token, language=language)
             self._logger.info(f"Success refresh token - created token - {new_token.access_token}")
 
             return new_token

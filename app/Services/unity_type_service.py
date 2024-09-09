@@ -18,9 +18,12 @@ class UnityTypeService(BaseService):
 
     def read_all(self, language: LangEnum) -> list[UnityTypeDTO]:
         db_session = self._create_db_session()
+        self._logger.info("Starting read_all unity types")
 
         try:
+            self._logger.debug("Trying to get all unity types")
             unity_types = self._repository.read_all(db_session, language)
+            self._logger.info(f"Unity types found: {unity_types}")
             return unity_types
 
         except Exception as e:

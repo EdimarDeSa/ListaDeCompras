@@ -1,13 +1,7 @@
-from app.Enums.enums import LangEnum
-from app.Utils.global_functions import MsgLoader
-
-
-# class ErrorsDict(dict):
-#     def __init__(self):
-#         super().__init__()
-#
-#     def insert(self, err: MessagesEnum, lang: LangEnum) -> None:
-#         self[err] = MsgLoader.get_message(err, lang)
-
+from typing import Protocol
 
 MessageType = dict["LanguagesEnum", dict["ExceptionEnum", str]]
+
+
+class BaseModelWithPassword(Protocol):
+    password: str

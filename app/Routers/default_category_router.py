@@ -11,9 +11,10 @@ class HttpExceptions:
 
 
 class DefaultCategoryRoutes(BaseRoutes):
-
     def __init__(self) -> None:
+        self._logger = self.create_logger(__name__)
         self.api_router = self.create_api_router(prefix="/default_category", tags=["Default category"])
+
         self.__register_routes()
 
     def __register_routes(self) -> None:

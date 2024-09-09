@@ -45,6 +45,11 @@ class UpdateUserEmailDTO(BaseModel):
     last_update: datetime = Field(default_factory=datetime_now_utc, exclude=True)
 
 
+class UpdateUserPasswordDTO(BaseModel):
+    password: str = Field(examples=["P@s5W0rD"])
+    last_update: datetime = Field(default_factory=datetime_now_utc, exclude=True)
+
+
 class NewUser(BaseRequest):
     password: str = Field(examples=["P@s5W0rD"])
     email: str = Field(examples=["your.email@domain.com"])

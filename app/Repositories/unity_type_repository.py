@@ -7,13 +7,16 @@ from app.Repositories.base_repository import BaseRepository
 
 
 class UnityTypeRepository(BaseRepository):
-    def read_all(self, db_session: scoped_session[Session], language: LangEnum) -> list[UnityTypeDTO]:
-        self.db_session = db_session
+    def __init__(self):
+        self._query = self.create_query()
+        self._logger = self.create_logger(__name__)
 
+    def read_all(self, db_session: scoped_session[Session], language: LangEnum) -> list[UnityTypeDTO]:
         try:
+            self._logger.debug("Trying to get all unity types")
             query = self._query.select_all_unity_types()
 
-            result = self.db_session.execute(query).all()
+            result = db_session.execute(query).all()
 
             if result is None:
                 raise InternalErrors.NOT_FOUND_404(rc=ResponseCode.UNITY_TYPE_NOT_FOUND, language=language)
@@ -28,12 +31,10 @@ class UnityTypeRepository(BaseRepository):
     def read_by_name(
         self, db_session: scoped_session[Session], unity_type_name: str, language: LangEnum
     ) -> UnityTypeDTO:
-        self.db_session = db_session
-
         try:
             query = self._query.select_unity_type_by_name(unity_type_name)
 
-            result = self.db_session.execute(query).first()
+            result = db_session.execute(query).first()
 
             if result is None:
                 raise InternalErrors.NOT_FOUND_404(rc=ResponseCode.UNITY_TYPE_NOT_FOUND, language=language)

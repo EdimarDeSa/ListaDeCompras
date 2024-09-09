@@ -3,6 +3,7 @@ from starlette.responses import RedirectResponse
 
 from app.DataBase.models.version_model import VersionModel
 from app.Enums.enums import ResponseCode, LangEnum
+from app.InternalResponse.base_internal_response import BaseInternalResponses
 from app.Routers.base_router import BaseRoutes
 from app.Schemas.responses.base_response import BaseResponse, BaseContent
 from app.Services.utils_service import UtilsService
@@ -11,7 +12,7 @@ from app.Services.utils_service import UtilsService
 class UtilsRoutes(BaseRoutes):
     def __init__(self):
         self.api_router = self.create_api_router(tags=["Utils"])
-        self._service = self._create_service()
+        self._logger = self.create_logger(__name__)
 
         self.register_routes()
 
@@ -21,8 +22,12 @@ class UtilsRoutes(BaseRoutes):
         self._router.add_api_route("/", self.home, methods=["GET"])
 
     def health(self, request: Request) -> BaseResponse:
+        self._logger.info("Checking health...")
+        service = self._create_service()
+
         try:
-            result = self._service.check_health(LangEnum.EN_US)
+            result: BaseInternalResponses = service.check_health(LangEnum.EN_US)
+            self._logger.info(f"Health check status: {result}")
 
             content = BaseContent(rc=0, data=result.message)
             return BaseResponse(status_code=200, content=content)
@@ -31,8 +36,12 @@ class UtilsRoutes(BaseRoutes):
             self.return_exception(e)
 
     def version(self, request: Request) -> BaseResponse:
+        service = self._create_service()
+        self._logger.info("Getting version...")
+
         try:
-            version: VersionModel = self._service.get_version()
+            version: VersionModel = service.get_version()
+            self._logger.debug(f"<Version: {version}>")
 
             content = BaseContent(rc=ResponseCode.OK, data=version)
             return BaseResponse(status_code=st.HTTP_200_OK, content=content)
@@ -42,6 +51,7 @@ class UtilsRoutes(BaseRoutes):
 
     def home(self, request: Request) -> RedirectResponse:
         # Redirect to Swagger docs
+        self._logger.info("Redirecting from Home to Swagger docs...")
         return RedirectResponse(url="/docs")
 
     def _create_service(self) -> UtilsService:

@@ -19,10 +19,6 @@ class Query:
 
     ### USER TABLE ###
     @staticmethod
-    def select_all_users() -> Select[tuple[User]]:
-        return select(User).order_by(User.name)
-
-    @staticmethod
     def select_user_by_id(user_id: uuid.UUID) -> Select[User]:
         return select(User).where(User.id == user_id)
 

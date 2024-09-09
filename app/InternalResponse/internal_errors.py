@@ -17,6 +17,7 @@ class InternalErrors(Enum):
     BAD_GATEWAY_502 = st.HTTP_502_BAD_GATEWAY
     SERVICE_UNAVAILABLE_503 = st.HTTP_503_SERVICE_UNAVAILABLE
     GATEWAY_TIMEOUT_504 = st.HTTP_504_GATEWAY_TIMEOUT
+    INVALID_MODEL_422 = st.HTTP_422_UNPROCESSABLE_ENTITY
 
     def __call__(self, rc: ResponseCode, language: LangEnum = LangEnum.EN_US) -> BaseInternalResponses:
         return BaseInternalResponses(rc=rc, language=language, status_code=self.value)

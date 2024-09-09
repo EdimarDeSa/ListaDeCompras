@@ -21,7 +21,6 @@ class UtilsService(BaseService):
         db_session = self._create_db_session()
 
         try:
-
             self._repository.check_health(db_session, language)
 
             return InternalSuccess.OK()
@@ -34,7 +33,9 @@ class UtilsService(BaseService):
             db_session.close()
 
     def get_version(self) -> VersionModel:
+        self._logger.info("Getting version...")
         version = "0.1.0"
+        self._logger.info(f"Version: {version}")
         return VersionModel.from_string(version)
 
     def _create_repository(self) -> UtilsRepository:
