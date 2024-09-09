@@ -13,3 +13,6 @@ class BaseRequest(BaseModel):
     name: str
     creation: datetime = Field(default_factory=datetime_now_utc, frozen=True, exclude=True)
     last_update: datetime = Field(default_factory=datetime_now_utc, frozen=True, exclude=True)
+
+    def __str__(self) -> str:
+        return f"<Name: {self.name}>"

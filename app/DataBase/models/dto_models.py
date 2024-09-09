@@ -12,6 +12,9 @@ from app.Utils.global_functions import datetime_now_utc
 class BaseUserPropertyDTO(BaseRequest):
     user_id: uuid.UUID
 
+    def __str__(self) -> str:
+        return f"<Name: {self.name} - User: {self.user_id}>"
+
 
 class UserDTO(BaseRequest):
     email: str = Field(examples=["your.email@domain.com"])
@@ -70,6 +73,10 @@ class MarketDTO(BaseUserPropertyDTO):
 
 
 class UserCategoryDTO(BaseUserPropertyDTO):
+    pass
+
+
+class NewCategory(BaseUserPropertyDTO):
     pass
 
 
