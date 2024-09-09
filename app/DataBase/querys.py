@@ -7,6 +7,7 @@ from app.DataBase.models.defualt_product_models import DefaultProductDTO
 from app.DataBase.schemas.default_category_schema import DefaultCategory
 from app.DataBase.schemas.default_product_schema import DefaultProduct
 from app.DataBase.schemas.unity_type_schema import UnityType
+from app.DataBase.schemas.user_categories_schema import UserCategories
 from app.DataBase.schemas.user_schema import User
 
 
@@ -31,11 +32,11 @@ class Query:
         return update(User).where(User.id == user_id).values(is_active=False)
 
     @staticmethod
-    def update_user_by_id(user_id: uuid.UUID, **kwargs) -> Update[User]:
+    def update_user_by_id(user_id: uuid.UUID, **kwargs: dict) -> Update[User]:
         return update(User).where(User.id == user_id).values(**kwargs)
 
     @staticmethod
-    def insert_user(**kwargs) -> Insert[User]:
+    def insert_user(**kwargs: dict) -> Insert[User]:
         return insert(User).values(**kwargs)
 
     ### UNITY TYPE TABLE ###
@@ -66,5 +67,8 @@ class Query:
         return select(DefaultProduct).where(DefaultProduct.name == default_product_name)
 
     @staticmethod
-    def insert_default_product(**kwargs) -> Insert[DefaultProductDTO]:
+    def insert_default_product(**kwargs: dict) -> Insert[DefaultProductDTO]:
         return insert(DefaultProduct).values(**kwargs)
+
+    def insert_user_categories(self, values: list[dict]) -> Insert[UserCategories]:
+        return insert(UserCategories).values(values)

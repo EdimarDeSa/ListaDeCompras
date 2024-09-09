@@ -10,21 +10,16 @@ from app.DataBase.models.dto_models import (
     DefaultCategoryDTO,
     UpdateUserEmailDTO,
     UpdateUserPasswordDTO,
+    NewCategory,
 )
 from app.Enums.enums import LangEnum
 from app.Repositories.default_category_repository import DefaultCategoryRepository
 from app.Repositories.default_products_repository import DefaultProductsRepository
+from app.Repositories.user_categories_repository import UserCategoriesRepository
+from app.Repositories.user_products_repository import UserProductsRepository
 from app.Repositories.user_repository import UserRepository
 from app.Services.base_service import BaseService
 from app.Validators.user_validator import UserValidator
-
-
-class UserProductsRepository:
-    pass
-
-
-class UserCategoriesRepository:
-    pass
 
 
 class UserService(BaseService):
@@ -66,7 +61,7 @@ class UserService(BaseService):
             self._logger.debug(f"User created: {user}")
 
             self._logger.debug(f"Activating user: {user.id}")
-            # self.active_user(db_session, user.id, language)
+            self.activate_user(db_session, user.id, language)
             self._logger.debug(f"User activated: {user.id}")
 
             db_session.commit()
@@ -161,22 +156,27 @@ class UserService(BaseService):
         finally:
             db_session.close()
 
-    def activate_user(self, db_session: scoped_session[Session], id_user: UUID, language: LangEnum) -> None:
-        # Coleta as categorias padrões
+    def activate_user(self, db_session: scoped_session[Session], user_id: UUID, language: LangEnum) -> None:
+        self._logger.info(f"Activating user: {user_id}")
+
+        self._logger.debug("Getting all default categories")
         default_categories: list[DefaultCategoryDTO] = self._def_cat_repository.read_all(db_session, language)
 
-        # Registra as categorias para o usuário
-        self._user_cat_repository.create_default_user_categories(db_session, id_user, default_categories, language)
+        self._logger.debug("Creating user categories")
+        new_categories = [NewCategory(name=c.name, user_id=user_id) for c in default_categories]
+
+        self._logger.debug(f"<Categories: {new_categories}>")
+        self._user_cat_repository.create_default_user_categories(db_session, new_categories, language)
 
         # Coleta todas as categorias do usuário
-        user_categories = self._user_cat_repository.get_all_user_categories(db_session, id_user, language)
+        user_categories = self._user_cat_repository.get_all_user_categories(db_session, user_id, language)
 
         # Coleta todos os produtos padrões
         default_products = self._def_prod_repository.get_all_default_products(db_session, language)
 
         # Registra produtos para o usuário
         self._user_prod_repository.create_default_user_products(
-            db_session, id_user, default_products, user_categories, language
+            db_session, user_id, default_products, user_categories, language
         )
 
     def _create_repository(self) -> UserRepository:

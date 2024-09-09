@@ -60,6 +60,7 @@ class UserRoutes(BaseRoutes):
 
         if request.headers.get("Authorization", None) is not None:
             self._logger.debug("User already logged - Cannot create new user")
+
             content = BaseContent(rc=ResponseCode.ALREADY_LOGGED)
             return BaseResponse(status_code=st.HTTP_403_FORBIDDEN, content=content)
 
