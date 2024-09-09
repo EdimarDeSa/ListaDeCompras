@@ -1,5 +1,3 @@
-import logging
-
 from sqlalchemy.orm import scoped_session, Session
 
 from app.DataBase.connection import DBConnectionHandler, get_db_url
@@ -13,8 +11,7 @@ from app.Validators.base_validator import BaseValidator
 class UnityTypeService(BaseService):
     def __init__(self) -> None:
         self._repository = self._create_repository()
-        self._validator = self._create_validator()
-        self._logger = self._create_logger()
+        self._logger = self.create_logger(__name__)
 
     def read_all(self, language: LangEnum) -> list[UnityTypeDTO]:
         db_session = self._create_db_session()
@@ -22,7 +19,7 @@ class UnityTypeService(BaseService):
 
         try:
             self._logger.debug("Trying to get all unity types")
-            unity_types = self._repository.read_all(db_session, language)
+            unity_types: list[UnityTypeDTO] = self._repository.read_all(db_session, language)
             self._logger.info(f"Unity types found: {unity_types}")
             return unity_types
 
@@ -35,9 +32,12 @@ class UnityTypeService(BaseService):
 
     def read_by_name(self, unity_type_name: str, language: LangEnum) -> UnityTypeDTO:
         db_session = self._create_db_session()
+        self._logger.info("Starting read_by_name unity type")
 
         try:
+            self._logger.debug(f"Trying to get unity type by name: {unity_type_name}")
             unity_type = self._repository.read_by_name(db_session, unity_type_name, language)
+            self._logger.info(f"Unity type found: {unity_type}")
             return unity_type
 
         except Exception as e:
@@ -55,6 +55,3 @@ class UnityTypeService(BaseService):
 
     def _create_validator(self) -> type[BaseValidator]:
         pass
-
-    def _create_logger(self) -> logging.Logger:
-        return logging.getLogger(__name__)

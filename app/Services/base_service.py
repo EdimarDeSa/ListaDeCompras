@@ -24,6 +24,6 @@ class BaseService(ABC):
     def _create_validator(self) -> type[BaseValidator]:
         pass
 
-    @staticmethod
-    def _create_logger(name: str) -> logging.Logger:
+    @classmethod
+    def create_logger(cls, name: str) -> logging.Logger:
         return logging.getLogger(name)

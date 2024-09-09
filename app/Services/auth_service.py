@@ -25,7 +25,7 @@ class AuthService(BaseService):
     def __init__(self) -> None:
         self._repository = self._create_repository()
         self._validator = self._create_validator()
-        self._logger = self._create_logger(__name__)
+        self._logger = self.create_logger(__name__)
 
     def authenticate_user(self, user_email: str, password: str, language: LangEnum) -> Token:
         db_session = self._create_db_session()

@@ -52,6 +52,8 @@ class DefaultProductsRepository(BaseRepository):
             db_session.execute(query)
             db_session.flush()
 
+            self._logger.debug("Product inserted successfully")
+
             return DefaultProductDTO.model_validate(new_product)
         except Exception as e:
             self.return_db_error(e, language)

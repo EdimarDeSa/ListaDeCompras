@@ -1,5 +1,3 @@
-from logging import Logger, getLogger
-
 from sqlalchemy.orm import scoped_session, Session
 
 from app.DataBase.connection import DBConnectionHandler, get_db_url
@@ -14,19 +12,21 @@ class DefaultProductsService(BaseService):
     def __init__(self) -> None:
         self._repository = self._create_repository()
         self._validator = self._create_validator()
-        self._logger = self._create_logger()
+        self._logger = self.create_logger(__name__)
 
     def get_all_default_products(self, language: LangEnum) -> list[DefaultProductDTO]:
         db_session = self._create_db_session()
 
+        self._logger.info("Starting get_all_default_products")
+
         try:
-            products = self._repository.get_all_default_products(db_session, language)
+            self._logger.debug("Trying to get all default products")
+            products: list[DefaultProductDTO] = self._repository.get_all_default_products(db_session, language)
 
             self._logger.debug(f"Default products found: {products}")
 
             return products
         except Exception as e:
-            self._logger.error(f"An error occurred while retrieving default products: {e}")
             raise e
 
         finally:
@@ -36,7 +36,7 @@ class DefaultProductsService(BaseService):
         db_session = self._create_db_session()
 
         try:
-            print(new_product)
+            self._logger.debug("Validating new default product")
             self._validator.validate_new_default_product(db_session, new_product, language)
             self._logger.debug("Product validated")
 
@@ -63,6 +63,3 @@ class DefaultProductsService(BaseService):
 
     def _create_validator(self) -> DefaultProductValidator:
         return DefaultProductValidator()
-
-    def _create_logger(self) -> Logger:
-        return getLogger(__name__)

@@ -15,7 +15,7 @@ from app.Validators.base_validator import BaseValidator
 class UtilsService(BaseService):
     def __init__(self) -> None:
         self._repository = self._create_repository()
-        self._logger = self._create_logger()
+        self._logger = self.create_logger(__name__)
 
     def check_health(self, language: LangEnum) -> BaseInternalResponses:
         db_session = self._create_db_session()
@@ -43,9 +43,6 @@ class UtilsService(BaseService):
 
     def _create_validator(self) -> type[BaseValidator]:
         pass
-
-    def _create_logger(self) -> Logger:
-        return Logger(__name__)
 
     def _create_db_session(self) -> scoped_session[Session]:
         return DBConnectionHandler.create_session(db_url=get_db_url())

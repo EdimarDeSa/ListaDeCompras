@@ -1,5 +1,3 @@
-from logging import Logger, getLogger
-
 from sqlalchemy.orm import scoped_session, Session
 
 from app.DataBase.connection import DBConnectionHandler, get_db_url
@@ -15,13 +13,18 @@ class DefaultCategoryService(BaseService):
         self._db_session = self._create_db_session()
         self._repository = self._create_repository()
         self._validator = self._create_validator()
-        self._logger = self._create_logger()
+        self._logger = self.create_logger(__name__)
 
     def read_all(self, language: LangEnum) -> list[DefaultCategoryDTO]:
         self._db_session = self._create_db_session()
 
+        self._logger.info(f"Starting read_all")
+
         try:
-            categories = self._repository.read_all(self._db_session, language)
+            self._logger.debug(f"Getting all categories")
+            categories: list[DefaultCategoryDTO] = self._repository.read_all(self._db_session, language)
+
+            self._logger.info(f"Categories found: {categories}")
 
             self._logger.debug(f"Categories found: {categories}")
 
@@ -41,6 +44,3 @@ class DefaultCategoryService(BaseService):
 
     def _create_validator(self) -> type[BaseValidator]:
         pass
-
-    def _create_logger(self) -> Logger:
-        return getLogger(__name__)

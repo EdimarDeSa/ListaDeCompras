@@ -1,6 +1,9 @@
 from sqlalchemy.orm import scoped_session, Session
 
 from app.DataBase.models.defualt_product_models import NewDefaultProduct
+from app.DataBase.schemas.default_category_schema import DefaultCategory
+from app.DataBase.schemas.default_product_schema import DefaultProduct
+from app.DataBase.schemas.unity_type_schema import UnityType
 from app.Enums.enums import ResponseCode, LangEnum
 from app.InternalResponse.internal_errors import InternalErrors
 from app.Validators.base_validator import BaseValidator
@@ -14,9 +17,13 @@ class DefaultProductValidator(BaseValidator):
     def validate_new_default_product(
         self, db_session: scoped_session[Session], new_product: NewDefaultProduct, language: LangEnum
     ):
+        self._logger.info("Starting validate_new_default_product")
+
         self.verify_if_name_does_not_exists(db_session, new_product.name, language)
         self.verify_if_default_unit_type_name_exists(db_session, new_product.unit_type_name, language)
         self.verify_if_default_category_name_exists(db_session, new_product.default_category_name, language)
+
+        self._logger.info("Product validated")
 
     def raise_error(self, error: ResponseCode, language: LangEnum) -> None:
         self._logger.exception(error)
@@ -25,10 +32,12 @@ class DefaultProductValidator(BaseValidator):
     def verify_if_name_does_not_exists(
         self, db_session: scoped_session[Session], name: str, language: LangEnum
     ) -> None:
-
+        self._logger.info("Verifying if name exists")
         query = self._query.select_default_product_by_name(name)
 
-        result = db_session.execute(query).first()
+        self._logger.debug(f"Searching for {name}")
+        result: DefaultProduct = db_session.execute(query).scalars().first()
+        self._logger.info(f"Founded {result}")
 
         if result is not None:
             self.raise_error(ResponseCode.PRODUCT_NAME_EXISTS, language)
@@ -36,10 +45,12 @@ class DefaultProductValidator(BaseValidator):
     def verify_if_default_unit_type_name_exists(
         self, db_session: scoped_session[Session], unit_type_name: str, language: LangEnum
     ) -> None:
-        self._logger.debug(f"Searching for {unit_type_name}")
+        self._logger.info(f"Verifying if {unit_type_name} exists")
         query = self._query.select_unity_type_by_name(unit_type_name)
-        result = db_session.execute(query).scalars().first()
-        self._logger.debug(f"Founded {result}")
+
+        self._logger.debug(f"Searching for {unit_type_name}")
+        result: UnityType = db_session.execute(query).scalars().first()
+        self._logger.info(f"Founded {result}")
 
         if result is None:
             self.raise_error(ResponseCode.INVALID_UNIT_TYPE, language)
@@ -47,9 +58,12 @@ class DefaultProductValidator(BaseValidator):
     def verify_if_default_category_name_exists(
         self, db_session: scoped_session[Session], category_name: str, language: LangEnum
     ) -> None:
+        self._logger.info(f"Verifying if {category_name} exists")
         query = self._query.select_default_category_by_name(category_name)
 
-        result = db_session.execute(query).first()
+        self._logger.debug(f"Searching for {category_name}")
+        result: DefaultCategory = db_session.execute(query).scalars().first()
+        self._logger.info(f"Founded {result}")
 
         if result is None:
             self.raise_error(ResponseCode.INVALID_CATEGORY, language)

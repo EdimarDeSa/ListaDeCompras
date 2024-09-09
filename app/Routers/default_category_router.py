@@ -1,5 +1,6 @@
 from fastapi import Request
 
+from app.DataBase.models.dto_models import DefaultCategoryDTO
 from app.Enums.enums import LangEnum
 from app.Routers.base_router import BaseRoutes
 from app.Schemas.responses.base_response import BaseResponse, BaseContent
@@ -24,8 +25,13 @@ class DefaultCategoryRoutes(BaseRoutes):
     async def get_all_default_categories(self, request: Request, language: LangEnum) -> BaseResponse:
         service = self._create_service()
 
+        self._logger.info(f"Starting get_all_default_categories")
+
         try:
-            default_categories = service.read_all(language)
+            self._logger.debug(f"Getting all default categories")
+            default_categories: list[DefaultCategoryDTO] = service.read_all(language)
+
+            self._logger.info(f"Default categories found: {default_categories}")
 
             content = BaseContent(data=default_categories)
             return BaseResponse(status_code=200, content=content)

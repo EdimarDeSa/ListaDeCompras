@@ -14,16 +14,18 @@ class DefaultCategoryRepository(BaseRepository):
         self._logger = self.create_logger(__name__)
 
     def read_all(self, db_session: scoped_session[Session], language: LangEnum) -> list[DefaultCategoryDTO]:
-
+        self._logger.info(f"Starting read_all")
         try:
             query = self._query.select_all_default_categories()
 
+            self._logger.debug("Searching all default categories")
             result: Sequence[DefaultCategory] = db_session.execute(query).scalars().all()
+            self._logger.info(f"Default categories found: {result}")
 
             if result is None:
                 raise InternalErrors.NOT_FOUND_404(rc=ResponseCode.CATEGORY_NOT_FOUND, language=language)
 
-            categories = [DefaultCategoryDTO.model_validate(c) for c in result]
+            categories = [DefaultCategoryDTO.model_validate(c, from_attributes=True) for c in result]
 
             return categories
 

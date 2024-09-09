@@ -35,7 +35,7 @@ class UserService(BaseService):
         self._user_prod_repository = UserProductsRepository()
         self._def_prod_repository = DefaultProductsRepository()
         self._validator = self._create_validator()
-        self._logger = self._create_logger(__name__)
+        self._logger = self.create_logger(__name__)
 
     def read_by_id(self, user_id: UUID, language: LangEnum) -> UserDTO:
         db_session = self._create_db_session()

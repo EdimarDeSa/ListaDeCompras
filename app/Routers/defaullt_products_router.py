@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import Request, Depends
 from fastapi import status as st
 
-from app.DataBase.models.defualt_product_models import NewDefaultProduct
+from app.DataBase.models.defualt_product_models import NewDefaultProduct, DefaultProductDTO
 from app.DataBase.models.token_model import TokenData
 from app.Enums.enums import LangEnum
 from app.Routers.base_router import BaseRoutes
@@ -15,7 +15,6 @@ from app.Services.default_products_service import DefaultProductsService
 class DefaultProductsRoutes(BaseRoutes):
     def __init__(self) -> None:
         self._logger = self.create_logger(__name__)
-        self._service = self._create_service()
         self.api_router = self.create_api_router(prefix="/default_products", tags=["Default Products"])
         self.__register_routes()
 
@@ -28,9 +27,13 @@ class DefaultProductsRoutes(BaseRoutes):
 
     def get_all_default_products(self, request: Request, language: LangEnum) -> BaseResponse:
         service = self._create_service()
+        self._logger.info("Starting get_all_default_products")
 
         try:
-            result = service.get_all_default_products(language)
+            self._logger.debug("Trying to get all default products")
+            result: list[DefaultProductDTO] = service.get_all_default_products(language)
+
+            self._logger.info(f"Default products found: {result}")
 
             content = BaseContent(data=result)
             return BaseResponse(content=content)
@@ -46,13 +49,17 @@ class DefaultProductsRoutes(BaseRoutes):
         language: LangEnum,
     ) -> BaseResponse:
         service = self._create_service()
+        self._logger.info("Starting post_new_default_product")
 
         # TODO: Implementar verificação de perfil
-        # if current_user.perfil.name != "ADMIN":
+        # if current_user.perfil.name != UserProfileEnum.ADMIN:
         #     raise InternalErrors.FORBIDDEN_403(ResponseCode.FORBIDDEN_ADMIN_ACCESS, language)
 
         try:
-            result = service.create_new_default_product(new_product, language)
+            self._logger.debug("Trying to create new default product")
+            result: DefaultProductDTO = service.create_new_default_product(new_product, language)
+
+            self._logger.info(f"Default product created: {result.id}")
 
             content = BaseContent(data=result)
             return BaseResponse(status_code=st.HTTP_201_CREATED, content=content)

@@ -35,9 +35,13 @@ class UnityTypeRoutes(BaseRoutes):
 
     async def get_unity_type_by_name(self, request: Request, unity_type_name: str, language: LangEnum) -> BaseResponse:
         service = self._create_service()
+        self._logger.info("Starting get_unity_type_by_name")
 
         try:
+            self._logger.debug(f"Trying to get unity type by name: {unity_type_name}")
             unity_type = service.read_by_name(unity_type_name, language)
+            self._logger.info(f"Unity type found: {unity_type}")
+
             content = BaseContent(data=unity_type)
             return BaseResponse(content=content)
 
