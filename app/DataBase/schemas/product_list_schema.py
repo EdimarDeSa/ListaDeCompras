@@ -1,7 +1,7 @@
 from sqlalchemy import Integer, ForeignKey, Boolean
 from sqlalchemy.orm import MappedColumn
 
-from app.DataBase.schemas.base_schemas import BaseSchema
+from DataBase.schemas.base_schemas import BaseSchema
 
 
 class ProductList(BaseSchema):

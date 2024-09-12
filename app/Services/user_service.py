@@ -2,24 +2,26 @@ from uuid import UUID
 
 from sqlalchemy.orm import scoped_session, Session
 
-from app.DataBase.connection import DBConnectionHandler, get_db_url
-from app.DataBase.models.dto_models import (
+from DataBase.connection_handler import DBConnectionHandler, get_db_url
+from DataBase.models.defualt_product_models import DefaultProductDTO
+from DataBase.models.dto_models import (
     UserDTO,
     NewUser,
     UpdateUserDTO,
     DefaultCategoryDTO,
     UpdateUserEmailDTO,
     UpdateUserPasswordDTO,
-    NewCategory,
+    NewUserCategory,
+    UserCategoryDTO,
 )
-from app.Enums.enums import LangEnum
-from app.Repositories.default_category_repository import DefaultCategoryRepository
-from app.Repositories.default_products_repository import DefaultProductsRepository
-from app.Repositories.user_categories_repository import UserCategoriesRepository
-from app.Repositories.user_products_repository import UserProductsRepository
-from app.Repositories.user_repository import UserRepository
-from app.Services.base_service import BaseService
-from app.Validators.user_validator import UserValidator
+from Enums.enums import LangEnum
+from Repositories.default_category_repository import DefaultCategoryRepository
+from Repositories.default_products_repository import DefaultProductsRepository
+from Repositories.user_categories_repository import UserCategoriesRepository
+from Repositories.user_products_repository import UserProductsRepository
+from Repositories.user_repository import UserRepository
+from Services.base_service import BaseService
+from Validators.user_validator import UserValidator
 
 
 class UserService(BaseService):
@@ -157,27 +159,37 @@ class UserService(BaseService):
             db_session.close()
 
     def activate_user(self, db_session: scoped_session[Session], user_id: UUID, language: LangEnum) -> None:
+        # TODO: Finalizar regra de negócio
         self._logger.info(f"Activating user: {user_id}")
 
-        self._logger.debug("Getting all default categories")
-        default_categories: list[DefaultCategoryDTO] = self._def_cat_repository.read_all(db_session, language)
+        self._logger.debug("Selecting all default categories")
+        default_categories: list[DefaultCategoryDTO] = self._def_cat_repository.select_all(db_session, language)
 
         self._logger.debug("Creating user categories")
-        new_categories = [NewCategory(name=c.name, user_id=user_id) for c in default_categories]
+        new_categories = [NewUserCategory(name=c.name, user_id=user_id) for c in default_categories]
 
-        self._logger.debug(f"<Categories: {new_categories}>")
+        self._logger.debug(f"Created <Categories: {new_categories}>")
         self._user_cat_repository.create_default_user_categories(db_session, new_categories, language)
 
-        # Coleta todas as categorias do usuário
-        user_categories = self._user_cat_repository.get_all_user_categories(db_session, user_id, language)
+        self._logger.debug("Selecting all user categories")
+        user_categories: list[UserCategoryDTO] = self._user_cat_repository.get_all_user_categories_by_user_id(
+            db_session, user_id, language
+        )
+        self._logger.debug("User categories selected")
 
-        # Coleta todos os produtos padrões
-        default_products = self._def_prod_repository.get_all_default_products(db_session, language)
+        self._logger.debug("Selecting all default products")
+        default_products: list[DefaultProductDTO] = self._def_prod_repository.get_all_default_products(
+            db_session, language
+        )
+        self._logger.debug("Default products selected")
 
-        # Registra produtos para o usuário
+        self._logger.debug("Creating user products")
         self._user_prod_repository.create_default_user_products(
             db_session, user_id, default_products, user_categories, language
         )
+        self._logger.debug("User products created")
+
+        self._logger.info(f"User activated: {user_id}")
 
     def _create_repository(self) -> UserRepository:
         return UserRepository()

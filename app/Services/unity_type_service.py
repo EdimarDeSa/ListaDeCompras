@@ -1,11 +1,11 @@
 from sqlalchemy.orm import scoped_session, Session
 
-from app.DataBase.connection import DBConnectionHandler, get_db_url
-from app.DataBase.models.dto_models import UnityTypeDTO
-from app.Enums.enums import LangEnum
-from app.Repositories.unity_type_repository import UnityTypeRepository
-from app.Services.base_service import BaseService
-from app.Validators.base_validator import BaseValidator
+from DataBase.connection_handler import DBConnectionHandler, get_db_url
+from DataBase.models.dto_models import UnityTypeDTO
+from Enums.enums import LangEnum
+from Repositories.unity_type_repository import UnityTypeRepository
+from Services.base_service import BaseService
+from Validators.base_validator import BaseValidator
 
 
 class UnityTypeService(BaseService):

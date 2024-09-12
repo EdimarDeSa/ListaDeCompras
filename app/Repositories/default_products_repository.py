@@ -3,13 +3,13 @@ from typing import Any
 from sqlalchemy import Sequence
 from sqlalchemy.orm import scoped_session, Session
 
-from app.DataBase.models.defualt_product_models import DefaultProductDTO, NewDefaultProduct
-from app.DataBase.schemas.default_category_schema import DefaultCategory
-from app.DataBase.schemas.default_product_schema import DefaultProduct
-from app.DataBase.schemas.unity_type_schema import UnityType
-from app.Enums.enums import LangEnum, ResponseCode
-from app.InternalResponse.internal_errors import InternalErrors
-from app.Repositories.base_repository import BaseRepository
+from DataBase.models.defualt_product_models import DefaultProductDTO, NewDefaultProduct
+from DataBase.schemas.default_category_schema import DefaultCategory
+from DataBase.schemas.default_product_schema import DefaultProduct
+from DataBase.schemas.unity_type_schema import UnityType
+from Enums.enums import LangEnum, ResponseCode
+from InternalResponse.internal_errors import InternalErrors
+from Repositories.base_repository import BaseRepository
 
 
 class DefaultProductsRepository(BaseRepository):
@@ -20,33 +20,38 @@ class DefaultProductsRepository(BaseRepository):
     def get_all_default_products(
         self, db_session: scoped_session[Session], language: LangEnum
     ) -> list[DefaultProductDTO]:
+        self._logger.info("Starting get_all_default_products")
 
         try:
-            self._logger.debug("Creating query to get all default products")
+            self._logger.debug(f"Creating query to get all default products on table: {DefaultProduct.__tablename__}")
             query = self._query.select_all_default_products()
 
             self._logger.debug("Trying to get all default products")
-            result: Sequence[DefaultProduct] = db_session.execute(query).scalars().all()
+            result: Sequence[list[DefaultProduct]] = db_session.execute(query).scalars().all()
 
-            self._logger.debug(f"Default products found: {result}")
+            self._logger.debug(f"Default products found: {len(result)}")
 
             if result is None:
+                self._logger.info("Default products not found")
                 raise InternalErrors.NOT_FOUND_404(rc=ResponseCode.PRODUCT_NOT_FOUND, language=language)
 
-            return [DefaultProductDTO.model_validate(product) for product in result]
+            return [DefaultProductDTO.model_validate(product, from_attributes=True) for product in result]
 
         except Exception as e:
+            self._logger.error(e)
             raise e
 
     def create_new_default_product(
         self, db_session: scoped_session[Session], new_product: NewDefaultProduct, language: LangEnum
     ):
+        self._logger.info("Starting create_new_default_product")
 
         try:
             self._logger.debug("Preparing new default product to insert")
             cleaned_data = self._prepare_data_to_insert(db_session, new_product)
             self._logger.debug("Product prepared successfully")
 
+            self._logger.debug(f"Creating query to get all default products on table: {DefaultProduct.__tablename__}")
             query = self._query.insert_default_product(**cleaned_data)
 
             db_session.execute(query)

@@ -4,16 +4,16 @@ from typing import Optional
 
 from pydantic import Field, BaseModel, ConfigDict
 
-from app.Enums.enums import LangEnum
-from app.Schemas.requests.base_request import BaseRequest
-from app.Utils.global_functions import datetime_now_utc
+from Enums.enums import LangEnum
+from Schemas.requests.base_request import BaseRequest
+from Utils.global_functions import datetime_now_utc
 
 
 class BaseUserPropertyDTO(BaseRequest):
     user_id: uuid.UUID
 
-    def __str__(self) -> str:
-        return f"<Name: {self.name} - User: {self.user_id}>"
+    def __repr__(self) -> str:
+        return f"<Id: {self.user_id}> | <Name: {self.name}>"
 
 
 class UserDTO(BaseRequest):
@@ -21,8 +21,8 @@ class UserDTO(BaseRequest):
     language: LangEnum = LangEnum.EN_US
     birthdate: date
 
-    def __eq__(self, other: "UserDTO") -> bool:
-        return all([self.id == other.id, self.email == other.email])
+    def __repr__(self) -> str:
+        return f"<Id: {self.user_id}> | <Name: {self.name}>"
 
 
 class UserLoginDTO(BaseModel):
@@ -75,8 +75,12 @@ class MarketDTO(BaseUserPropertyDTO):
 class UserCategoryDTO(BaseUserPropertyDTO):
     pass
 
+    def get_id_by_name(self, name: str) -> uuid.UUID:
+        if name == self.name:
+            return self.id
 
-class NewCategory(BaseUserPropertyDTO):
+
+class NewUserCategory(BaseUserPropertyDTO):
     pass
 
 
@@ -88,6 +92,10 @@ class UserProductsDTO(BaseUserPropertyDTO):
     notes: str
     barcode: str
     image_url: str
+
+
+class NewUserProduct(UserProductsDTO):
+    pass
 
 
 class ShoppingListDTO(BaseUserPropertyDTO):

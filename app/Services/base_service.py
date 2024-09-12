@@ -3,8 +3,9 @@ from abc import ABC, abstractmethod
 
 from sqlalchemy.orm import scoped_session, Session
 
-from app.Repositories.user_repository import BaseRepository
-from app.Validators.base_validator import BaseValidator
+from DataBase.connection_handler import create_session
+from Repositories.user_repository import BaseRepository
+from Validators.base_validator import BaseValidator
 
 
 class BaseService(ABC):
@@ -12,9 +13,8 @@ class BaseService(ABC):
     def __init__(self) -> None:
         pass
 
-    @abstractmethod
-    def _create_db_session(self) -> scoped_session[Session]:
-        pass
+    def create_db_session(self, write: bool = True) -> scoped_session[Session]:
+        return create_session(write=write)
 
     @abstractmethod
     def _create_repository(self) -> type[BaseRepository]:

@@ -1,19 +1,15 @@
 import logging
 import os
+import sys
 from logging.handlers import RotatingFileHandler
 
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
-from app.InternalResponse.internal_errors import InternalErrors
-from app.Middlewares.process_time import add_process_time_header
-from app.Routers.auth_router import AuthRoutes
-from app.Routers.base_router import BaseRoutes
-from app.Routers.defaullt_products_router import DefaultProductsRoutes
-from app.Routers.default_category_router import DefaultCategoryRoutes
-from app.Routers.unity_type_router import UnityTypeRoutes
-from app.Routers.user_router import UserRoutes
-from app.Routers.utils_router import UtilsRoutes
+from InternalResponse.internal_errors import InternalErrors
+from Middlewares.process_time import add_process_time_header
+from Routers.auth_router import AuthRoutes
+from Routers.base_router import BaseRoutes
 
 __all__ = [
     "TITLE",
@@ -28,7 +24,7 @@ __all__ = [
     "register_routes",
 ]
 
-from app.Utils.internal_types import METHODS
+from Utils.internal_types import METHODS
 
 ### APP CONFIG ###
 
@@ -69,29 +65,27 @@ SWAGGER_UI_PARAMETERS = {
 
 
 ### LOGGER ###
-logger = logging.getLogger(__name__)
-
-
 DEBUG_MODE: bool = bool(int(os.getenv("DEBUG_MODE", "0")))
 
-
 if DEBUG_MODE:
-    log_format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    log_format = (
+        "%(asctime)s [%(processName)s: %(process)d] [%(threadName)s: %(thread)d] [%(levelname)s] %(name)s: %(message)s"
+    )
 
-    logging.basicConfig(level=logging.DEBUG if DEBUG_MODE else logging.WARNING, format=log_format)
+    console_handler = logging.StreamHandler(stream=sys.stdout)
 
-    if not logger.handlers:
-        log_formater = logging.Formatter(log_format)
+    log_file = os.getenv("LOG_FILE", "app.log")
+    rotating_handler = RotatingFileHandler(log_file, maxBytes=2000, backupCount=5)
 
-        console_handler = logging.StreamHandler()
-        console_handler.setFormatter(log_formater)
-        logger.addHandler(console_handler)
+    logging.basicConfig(
+        level=logging.DEBUG,
+        format=log_format,
+        encoding="utf-8",
+        handlers=[console_handler, rotating_handler],
+        datefmt="%Y-%m-%d %H:%M:%S",
+    )
 
-        log_file = os.getenv("LOG_FILE", "app.log")
-        rotating_handler = RotatingFileHandler(log_file, maxBytes=2000, backupCount=5)
-        rotating_handler.setFormatter(log_formater)
-        logger.addHandler(rotating_handler)
-
+    logger = logging.getLogger(__name__)
     logger.info("Logger activated!")
 
 
@@ -129,11 +123,11 @@ def register_middlewares(app: FastAPI) -> None:
 ### ROUTERS ###
 routers: list[type[BaseRoutes]] = [
     AuthRoutes,
-    UserRoutes,
-    UtilsRoutes,
-    UnityTypeRoutes,
-    DefaultCategoryRoutes,
-    DefaultProductsRoutes,
+    # UserRoutes,
+    # UtilsRoutes,
+    # UnityTypeRoutes,
+    # DefaultCategoryRoutes,
+    # DefaultProductsRoutes,
 ]
 
 

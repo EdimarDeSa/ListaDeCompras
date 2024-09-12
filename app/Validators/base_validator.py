@@ -1,8 +1,8 @@
 import logging
 from abc import ABC, abstractmethod
 
-from app.DataBase.querys import Query
-from app.Enums.enums import ResponseCode, LangEnum
+from DataBase.querys import Query
+from Enums.enums import ResponseCode, LangEnum
 
 
 class BaseValidator(ABC):

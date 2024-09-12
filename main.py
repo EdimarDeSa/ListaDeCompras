@@ -4,7 +4,7 @@ load_dotenv()
 
 from fastapi import FastAPI
 
-from app.api_configs import *
+from api_configs import *
 
 
 app = FastAPI(

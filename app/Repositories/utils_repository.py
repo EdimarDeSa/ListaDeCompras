@@ -1,8 +1,8 @@
 from sqlalchemy.orm import scoped_session, Session
 
-from app.Enums.enums import ResponseCode, LangEnum
-from app.InternalResponse.internal_errors import InternalErrors
-from app.Repositories.base_repository import BaseRepository
+from Enums.enums import ResponseCode, LangEnum
+from InternalResponse.internal_errors import InternalErrors
+from Repositories.base_repository import BaseRepository
 
 
 class UtilsRepository(BaseRepository):

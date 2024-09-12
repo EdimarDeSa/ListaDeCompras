@@ -1,6 +1,6 @@
-from app.DataBase.models.defualt_product_models import NewDefaultProduct
-from app.Enums.enums import LangEnum
-from app.Services.default_products_service import DefaultProductsService
+from DataBase.models.defualt_product_models import NewDefaultProduct
+from Enums.enums import LangEnum
+from Services.default_products_service import DefaultProductsService
 
 
 class Populate:

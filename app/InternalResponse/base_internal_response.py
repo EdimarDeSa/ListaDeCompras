@@ -1,5 +1,5 @@
-from app.Enums.enums import ResponseCode, LangEnum
-from app.Utils.global_functions import MsgLoader
+from Enums.enums import ResponseCode, LangEnum
+from Utils.global_functions import MsgLoader
 
 
 class BaseInternalResponses(Exception):

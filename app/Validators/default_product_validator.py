@@ -1,12 +1,12 @@
 from sqlalchemy.orm import scoped_session, Session
 
-from app.DataBase.models.defualt_product_models import NewDefaultProduct
-from app.DataBase.schemas.default_category_schema import DefaultCategory
-from app.DataBase.schemas.default_product_schema import DefaultProduct
-from app.DataBase.schemas.unity_type_schema import UnityType
-from app.Enums.enums import ResponseCode, LangEnum
-from app.InternalResponse.internal_errors import InternalErrors
-from app.Validators.base_validator import BaseValidator
+from DataBase.models.defualt_product_models import NewDefaultProduct
+from DataBase.schemas.default_category_schema import DefaultCategory
+from DataBase.schemas.default_product_schema import DefaultProduct
+from DataBase.schemas.unity_type_schema import UnityType
+from Enums.enums import ResponseCode, LangEnum
+from InternalResponse.internal_errors import InternalErrors
+from Validators.base_validator import BaseValidator
 
 
 class DefaultProductValidator(BaseValidator):

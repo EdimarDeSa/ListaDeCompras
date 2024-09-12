@@ -1,12 +1,12 @@
 from fastapi import status as st, Request
 from starlette.responses import RedirectResponse
 
-from app.DataBase.models.version_model import VersionModel
-from app.Enums.enums import ResponseCode, LangEnum
-from app.InternalResponse.base_internal_response import BaseInternalResponses
-from app.Routers.base_router import BaseRoutes
-from app.Schemas.responses.base_response import BaseResponse, BaseContent
-from app.Services.utils_service import UtilsService
+from DataBase.models.version_model import VersionModel
+from Enums.enums import ResponseCode, LangEnum
+from InternalResponse.base_internal_response import BaseInternalResponses
+from Routers.base_router import BaseRoutes
+from Schemas.responses.base_response import BaseResponse, BaseContent
+from Services.utils_service import UtilsService
 
 
 class UtilsRoutes(BaseRoutes):

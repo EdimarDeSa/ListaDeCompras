@@ -3,11 +3,11 @@ from uuid import UUID
 from pydantic import BaseModel
 from sqlalchemy.orm import Session, scoped_session
 
-from app.DataBase.models.dto_models import UserDTO, NewUser, UpdateUserDTO, UserLoginDTO
-from app.DataBase.schemas.user_schema import User
-from app.Enums.enums import LangEnum, ResponseCode
-from app.InternalResponse.internal_errors import InternalErrors
-from app.Repositories.base_repository import BaseRepository
+from DataBase.models.dto_models import UserDTO, NewUser, UpdateUserDTO, UserLoginDTO
+from DataBase.schemas.user_schema import TbUser
+from Enums.enums import LangEnum, ResponseCode
+from InternalResponse.internal_errors import InternalErrors
+from Repositories.base_repository import BaseRepository
 
 
 class UserRepository(BaseRepository):
@@ -17,10 +17,10 @@ class UserRepository(BaseRepository):
 
     def read_by_id(self, db_session: scoped_session[Session], user_id: UUID, language: LangEnum) -> UserDTO:
         try:
-            self._logger.debug(f"Searching user with id - '{user_id}' - in table - '{User.__tablename__}'")
+            self._logger.debug(f"Searching user with id - '{user_id}' - in table - '{TbUser.__tablename__}'")
             query = self._query.select_user_by_id(user_id)
 
-            result: User = db_session.execute(query).scalars().first()  # type: ignore
+            result: TbUser = db_session.execute(query).scalars().first()  # type: ignore
             self._logger.debug(f"User found - <result: {result}>")
 
             if result is None:
@@ -39,24 +39,27 @@ class UserRepository(BaseRepository):
         to_login: bool = False,
         language: LangEnum = LangEnum.EN_US,
     ) -> UserDTO | UserLoginDTO:
+        self._logger.info("Starting read_by_email")
+
         try:
-            self._logger.debug(f"Searching user with email - '{user_email}' - in table - '{User.__tablename__}'")
+            self._logger.debug(f"Searching user with <Email: {user_email}> - in table - '{TbUser.__tablename__}'")
             query = self._query.select_user_by_email(user_email)
 
-            result: User = db_session.execute(query).scalars().first()
-            self._logger.debug(f"User found - {result.id}")
+            result: TbUser = db_session.execute(query).scalars().first()
+            self._logger.debug(f"User found - {result}")
 
             if result is None:
-                self._logger.debug("User not found")
+                self._logger.warning("User not found")
                 raise InternalErrors.NOT_FOUND_404(rc=ResponseCode.USER_NOT_FOUND, language=language)
 
+            self._logger.info("Selecting model")
+            model = UserDTO
             if to_login:
                 model = UserLoginDTO
-            else:
-                model = UserDTO
-            self._logger.debug(f"Model selected: {model.__name__}")
 
-            return model.model_validate(result)
+            self._logger.debug(f"<Model: {model.__name__}>")
+
+            return model.model_validate(result, from_attributes=True)
 
         except Exception as e:
             self.return_db_error(e, language)

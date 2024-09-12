@@ -5,12 +5,12 @@ from passlib.context import CryptContext
 from pydantic import BaseModel
 from sqlalchemy.orm import scoped_session, Session
 
-from app.DataBase.models.dto_models import NewUser, UpdateUserDTO
-from app.DataBase.schemas.user_schema import User
-from app.Enums.enums import LangEnum, ResponseCode
-from app.InternalResponse.internal_errors import InternalErrors
-from app.Utils.internal_types import BaseModelWithPassword
-from app.Validators.base_validator import BaseValidator
+from DataBase.models.dto_models import NewUser, UpdateUserDTO, UserLoginDTO
+from DataBase.schemas.user_schema import TbUser
+from Enums.enums import LangEnum, ResponseCode
+from InternalResponse.internal_errors import InternalErrors
+from Utils.internal_types import BaseModelWithPassword
+from Validators.base_validator import BaseValidator
 
 
 class UserValidator(BaseValidator):
@@ -74,8 +74,8 @@ class UserValidator(BaseValidator):
 
             query = self._query.select_user_by_email(email)
 
-            self._logger.debug(f"Checking if email - '{email}' - exists in table - '{User.__tablename__}'")
-            result: User = db_session.execute(query).scalars().first()
+            self._logger.debug(f"Checking if email - '{email}' - exists in table - '{TbUser.__tablename__}'")
+            result: TbUser = db_session.execute(query).scalars().first()
             self._logger.debug(f"User found - <user: {result}>")
 
             if result is not None:
@@ -110,20 +110,20 @@ class UserValidator(BaseValidator):
     def raise_error(self, error: ResponseCode, language: LangEnum) -> None:
         raise InternalErrors.BAD_REQUEST_400(error, language)
 
-    def verify_password_hash(self, password: str, hashed_password: str, language: LangEnum) -> None:
-        self._logger.debug("Verifying password hash")
+    def check_password_hash(self, password: str, hashed_password: str, language: LangEnum) -> None:
+        self._logger.debug("Verifying password hash...")
         is_valid = self._pwd_context.verify(secret=password, hash=hashed_password)
         self._logger.debug(f"Password hash verified - <is_valid: {is_valid}>")
 
         if is_valid is False:
-            self._logger.debug("Invalid password hash")
+            self._logger.warning("Invalid password")
             raise InternalErrors.FORBIDDEN_403(ResponseCode.INVALID_CREDENTIALS, language)
 
     def hash_password(self, password: str) -> str:
         return self._pwd_context.hash(secret=password)
 
-    def validate_user_active(self, is_active: bool, language: LangEnum) -> None:
-        self._logger.debug(f"Validating if user is active - {is_active}")
-        if is_active is False:
-            self._logger.debug("User is not active")
+    def check_if_user_is_active(self, user: UserLoginDTO, language: LangEnum) -> None:
+        self._logger.debug(f"Validating if user is active - {user.is_active}")
+        if user.is_active is False:
+            self._logger.warning(f"User {user.id} is not active")
             raise InternalErrors.FORBIDDEN_403(ResponseCode.USER_NOT_ACTIVE, language)

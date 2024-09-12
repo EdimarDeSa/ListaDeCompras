@@ -3,7 +3,7 @@ import uuid
 from sqlalchemy import ForeignKey, Text
 from sqlalchemy.orm import Mapped, MappedColumn
 
-from app.DataBase.schemas.base_schemas import BaseSchema
+from DataBase.schemas.base_schemas import BaseSchema
 
 
 class DefaultProduct(BaseSchema):

@@ -1,10 +1,10 @@
 from fastapi import Request
 
-from app.DataBase.models.dto_models import DefaultCategoryDTO
-from app.Enums.enums import LangEnum
-from app.Routers.base_router import BaseRoutes
-from app.Schemas.responses.base_response import BaseResponse, BaseContent
-from app.Services.default_category_service import DefaultCategoryService
+from DataBase.models.dto_models import DefaultCategoryDTO
+from Enums.enums import LangEnum
+from Routers.base_router import BaseRoutes
+from Schemas.responses.base_response import BaseResponse, BaseContent
+from Services.default_category_service import DefaultCategoryService
 
 
 class HttpExceptions:

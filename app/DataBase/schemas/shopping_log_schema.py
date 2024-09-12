@@ -4,7 +4,7 @@ from datetime import date
 from sqlalchemy import ForeignKey, DateTime
 from sqlalchemy.orm import Mapped, MappedColumn
 
-from app.DataBase.schemas.base_schema import BaseSchemaUserProperty
+from DataBase.schemas.base_schemas import BaseSchemaUserProperty
 
 
 class ShoppingLog(BaseSchemaUserProperty):

@@ -1,13 +1,20 @@
 import json
-from datetime import UTC, datetime
+import os
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Optional
 
-from app.Enums.enums import ResponseCode, LangEnum
+from Enums.enums import ResponseCode, LangEnum
 
 
 def datetime_now_utc() -> datetime:
     return datetime.now(UTC)
+
+
+def get_expire_time() -> int:
+    expires_delta = timedelta(minutes=int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 15)))
+    expires_time = datetime_now_utc() + expires_delta
+    return int(expires_time.timestamp())
 
 
 class MsgLoader:

@@ -1,11 +1,10 @@
-from sqlalchemy import Sequence
 from sqlalchemy.orm import scoped_session, Session
 
-from app.DataBase.models.dto_models import DefaultCategoryDTO
-from app.DataBase.schemas.default_category_schema import DefaultCategory
-from app.Enums.enums import LangEnum, ResponseCode
-from app.InternalResponse.internal_errors import InternalErrors
-from app.Repositories.base_repository import BaseRepository
+from DataBase.models.dto_models import DefaultCategoryDTO
+from DataBase.schemas.default_category_schema import DefaultCategory
+from Enums.enums import LangEnum, ResponseCode
+from InternalResponse.internal_errors import InternalErrors
+from Repositories.base_repository import BaseRepository
 
 
 class DefaultCategoryRepository(BaseRepository):
@@ -13,14 +12,14 @@ class DefaultCategoryRepository(BaseRepository):
         self._query = self.create_query()
         self._logger = self.create_logger(__name__)
 
-    def read_all(self, db_session: scoped_session[Session], language: LangEnum) -> list[DefaultCategoryDTO]:
-        self._logger.info(f"Starting read_all")
+    def select_all(self, db_session: scoped_session[Session], language: LangEnum) -> list[DefaultCategoryDTO]:
+        self._logger.info(f"Starting select_all")
         try:
             query = self._query.select_all_default_categories()
 
             self._logger.debug("Searching all default categories")
-            result: Sequence[DefaultCategory] = db_session.execute(query).scalars().all()
-            self._logger.info(f"Default categories found: {result}")
+            result: list[DefaultCategory] = list(db_session.execute(query).scalars().all())
+            self._logger.info(f"Default categories found: {len(result)}")
 
             if result is None:
                 raise InternalErrors.NOT_FOUND_404(rc=ResponseCode.CATEGORY_NOT_FOUND, language=language)

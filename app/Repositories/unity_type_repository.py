@@ -1,11 +1,11 @@
 from sqlalchemy import Sequence
 from sqlalchemy.orm import scoped_session, Session
 
-from app.DataBase.models.dto_models import UnityTypeDTO
-from app.DataBase.schemas.unity_type_schema import UnityType
-from app.Enums.enums import LangEnum, ResponseCode
-from app.InternalResponse.internal_errors import InternalErrors
-from app.Repositories.base_repository import BaseRepository
+from DataBase.models.dto_models import UnityTypeDTO
+from DataBase.schemas.unity_type_schema import UnityType
+from Enums.enums import LangEnum, ResponseCode
+from InternalResponse.internal_errors import InternalErrors
+from Repositories.base_repository import BaseRepository
 
 
 class UnityTypeRepository(BaseRepository):

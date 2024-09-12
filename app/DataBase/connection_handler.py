@@ -16,6 +16,19 @@ def get_db_url() -> str:
     return f"{db_dialect}://{db_user}:{db_password}@{db_ip}:{db_port}/{db_name}"
 
 
+def create_session(*, write=False) -> scoped_session[Session]:
+    db_url = get_db_url()
+
+    engine = create_engine(
+        db_url, pool_size=250, max_overflow=50, pool_use_lifo=True, pool_pre_ping=True, pool_recycle=300
+    )
+
+    if write:
+        return scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
+
+    return scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
+
+
 class DBConnectionHandler:
     @staticmethod
     def create_session(*, write=False, db_url: str) -> scoped_session[Session | Any]:

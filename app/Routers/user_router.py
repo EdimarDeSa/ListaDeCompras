@@ -2,13 +2,13 @@ from typing import Optional, Annotated
 
 from fastapi import Request, status as st, Depends
 
-from app.DataBase.models.dto_models import NewUser, UpdateUserDTO, UserDTO, UpdateUserEmailDTO, UpdateUserPasswordDTO
-from app.DataBase.models.token_model import TokenData
-from app.Enums.enums import ResponseCode, LangEnum
-from app.Routers.base_router import BaseRoutes
-from app.Schemas.responses.base_response import BaseResponse, BaseContent
-from app.Services.auth_service import decode_token
-from app.Services.user_service import UserService
+from DataBase.models.dto_models import NewUser, UpdateUserDTO, UserDTO, UpdateUserEmailDTO, UpdateUserPasswordDTO
+from DataBase.models.token_model import TokenData
+from Enums.enums import ResponseCode, LangEnum
+from Routers.base_router import BaseRoutes
+from Schemas.responses.base_response import BaseResponse, BaseContent
+from Services.auth_service import decode_token
+from Services.user_service import UserService
 
 
 class UserRoutes(BaseRoutes):

@@ -1,13 +1,13 @@
 import uuid
 
-from app.Models.models import User
+from Models.models import User
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy import delete
 
-from app.DataBase.connection import DBConnectionHandler, get_db_url
-from app.DataBase.models.dto_models import UserDTO
-from app.Enums.enums import ResponseCode
-from app.Utils.global_functions import MsgLoader
+from DataBase.connection_handler import DBConnectionHandler, get_db_url
+from DataBase.models.dto_models import UserDTO
+from Enums.enums import ResponseCode
+from Utils.global_functions import MsgLoader
 
 """
 Estrutura padrão:

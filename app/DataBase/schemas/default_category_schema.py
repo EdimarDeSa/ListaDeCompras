@@ -1,7 +1,7 @@
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, MappedColumn
 
-from app.DataBase.schemas.base_schemas import BaseSchema
+from DataBase.schemas.base_schemas import BaseSchema
 
 
 class DefaultCategory(BaseSchema):

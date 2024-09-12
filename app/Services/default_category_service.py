@@ -1,11 +1,11 @@
 from sqlalchemy.orm import scoped_session, Session
 
-from app.DataBase.connection import DBConnectionHandler, get_db_url
-from app.DataBase.models.dto_models import DefaultCategoryDTO
-from app.Enums.enums import LangEnum
-from app.Repositories.default_category_repository import DefaultCategoryRepository
-from app.Services.base_service import BaseService
-from app.Validators.base_validator import BaseValidator
+from DataBase.connection_handler import DBConnectionHandler, get_db_url
+from DataBase.models.dto_models import DefaultCategoryDTO
+from Enums.enums import LangEnum
+from Repositories.default_category_repository import DefaultCategoryRepository
+from Services.base_service import BaseService
+from Validators.base_validator import BaseValidator
 
 
 class DefaultCategoryService(BaseService):
@@ -22,7 +22,7 @@ class DefaultCategoryService(BaseService):
 
         try:
             self._logger.debug(f"Getting all categories")
-            categories: list[DefaultCategoryDTO] = self._repository.read_all(self._db_session, language)
+            categories: list[DefaultCategoryDTO] = self._repository.select_all(self._db_session, language)
 
             self._logger.info(f"Categories found: {categories}")
 

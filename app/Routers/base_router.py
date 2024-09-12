@@ -4,11 +4,11 @@ from abc import ABC, abstractmethod
 from fastapi import APIRouter
 from fastapi import status as st
 
-from app.Enums.enums import ResponseCode
-from app.InternalResponse.base_internal_response import BaseInternalResponses
-from app.InternalResponse.internal_errors import InternalErrors
-from app.Schemas.responses.base_response import BaseResponse, BaseContent
-from app.Services.user_service import BaseService
+from Enums.enums import ResponseCode
+from InternalResponse.base_internal_response import BaseInternalResponses
+from InternalResponse.internal_errors import InternalErrors
+from Schemas.responses.base_response import BaseResponse, BaseContent
+from Services.user_service import BaseService
 
 
 class BaseRoutes(ABC):
@@ -18,16 +18,16 @@ class BaseRoutes(ABC):
     def _create_service(self) -> type[BaseService]:
         pass
 
-    @staticmethod
-    def create_logger(name: str) -> logging.Logger:
+    def create_logger(self, name: str) -> logging.Logger:
         return logging.getLogger(name)
 
-    @staticmethod
-    def create_api_router(**kwargs) -> APIRouter:
+    def create_api_router(self, **kwargs) -> APIRouter:
         return APIRouter(**kwargs)
 
-    @staticmethod
-    def return_exception(e: Exception, **kwargs) -> BaseResponse:
+    def return_exception(self, e: Exception, logger: logging.Logger = None, **kwargs) -> BaseResponse:
+        if logger is not None:
+            logger.exception(e)
+
         if isinstance(e, BaseInternalResponses):
             content = BaseContent(rc=e.rc, data=e.message)
             return BaseResponse(status_code=e.status_code, content=content, **kwargs)

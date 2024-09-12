@@ -1,9 +1,8 @@
 from sqlalchemy import UniqueConstraint
 
-from app.DataBase.schemas.base_schema import BaseSchemaUserProperty
+from DataBase.schemas.base_schemas import BaseSchemaUserProperty
 
 
 class UserCategories(BaseSchemaUserProperty):
-    __tablename__ = "user_categories"
-
+    __tablename__ = "user_category"
     __table_args__ = (UniqueConstraint("name", "user_id"),)

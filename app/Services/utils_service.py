@@ -1,15 +1,13 @@
-from logging import Logger
-
 from sqlalchemy.orm import scoped_session, Session
 
-from app.DataBase.connection import get_db_url, DBConnectionHandler
-from app.DataBase.models.version_model import VersionModel
-from app.Enums.enums import LangEnum
-from app.InternalResponse.base_internal_response import BaseInternalResponses
-from app.InternalResponse.internal_success import InternalSuccess
-from app.Repositories.utils_repository import UtilsRepository
-from app.Services.base_service import BaseService
-from app.Validators.base_validator import BaseValidator
+from DataBase.connection_handler import get_db_url, DBConnectionHandler
+from DataBase.models.version_model import VersionModel
+from Enums.enums import LangEnum
+from InternalResponse.base_internal_response import BaseInternalResponses
+from InternalResponse.internal_success import InternalSuccess
+from Repositories.utils_repository import UtilsRepository
+from Services.base_service import BaseService
+from Validators.base_validator import BaseValidator
 
 
 class UtilsService(BaseService):

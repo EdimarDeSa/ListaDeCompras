@@ -1,7 +1,7 @@
 from sqlalchemy import Integer, UniqueConstraint
 from sqlalchemy.orm import Mapped, MappedColumn
 
-from app.DataBase.schemas.base_schema import BaseSchemaUserProperty
+from DataBase.schemas.base_schemas import BaseSchemaUserProperty
 
 
 class ShoppingList(BaseSchemaUserProperty):

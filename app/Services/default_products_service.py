@@ -1,11 +1,11 @@
 from sqlalchemy.orm import scoped_session, Session
 
-from app.DataBase.connection import DBConnectionHandler, get_db_url
-from app.DataBase.models.defualt_product_models import DefaultProductDTO, NewDefaultProduct
-from app.Enums.enums import LangEnum
-from app.Repositories.default_products_repository import DefaultProductsRepository
-from app.Services.base_service import BaseService
-from app.Validators.default_product_validator import DefaultProductValidator
+from DataBase.connection_handler import DBConnectionHandler, get_db_url
+from DataBase.models.defualt_product_models import DefaultProductDTO, NewDefaultProduct
+from Enums.enums import LangEnum
+from Repositories.default_products_repository import DefaultProductsRepository
+from Services.base_service import BaseService
+from Validators.default_product_validator import DefaultProductValidator
 
 
 class DefaultProductsService(BaseService):
@@ -23,7 +23,7 @@ class DefaultProductsService(BaseService):
             self._logger.debug("Trying to get all default products")
             products: list[DefaultProductDTO] = self._repository.get_all_default_products(db_session, language)
 
-            self._logger.debug(f"Default products found: {products}")
+            self._logger.debug(f"Default products found: {len(products)}")
 
             return products
         except Exception as e:

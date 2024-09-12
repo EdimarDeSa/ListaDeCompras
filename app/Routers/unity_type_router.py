@@ -1,9 +1,9 @@
 from fastapi import Request
 
-from app.Enums.enums import LangEnum
-from app.Routers.base_router import BaseRoutes
-from app.Schemas.responses.base_response import BaseResponse, BaseContent
-from app.Services.unity_type_service import UnityTypeService
+from Enums.enums import LangEnum
+from Routers.base_router import BaseRoutes
+from Schemas.responses.base_response import BaseResponse, BaseContent
+from Services.unity_type_service import UnityTypeService
 
 
 class UnityTypeRoutes(BaseRoutes):

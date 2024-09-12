@@ -3,7 +3,7 @@ from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field, ConfigDict
 
-from app.Utils.global_functions import datetime_now_utc
+from Utils.global_functions import datetime_now_utc
 
 
 class BaseRequest(BaseModel):
@@ -11,8 +11,8 @@ class BaseRequest(BaseModel):
 
     id: UUID = Field(default_factory=uuid4, frozen=True, exclude=True)
     name: str
-    creation: datetime = Field(default_factory=datetime_now_utc, frozen=True, exclude=True)
-    last_update: datetime = Field(default_factory=datetime_now_utc, frozen=True, exclude=True)
+    creation: datetime = Field(default_factory=datetime_now_utc, frozen=True, exclude=True, init=False)
+    last_update: datetime = Field(default_factory=datetime_now_utc, frozen=True, init=False)
 
     def __str__(self) -> str:
         return f"<Name: {self.name}>"

@@ -1,7 +1,7 @@
 from pydantic import ValidationError
 from pytest import raises
 
-from app.DataBase.models.dto_models import UserDTO
+from DataBase.models.dto_models import UserDTO
 
 
 def test_create_userdto_success(create_valid_user_data):
