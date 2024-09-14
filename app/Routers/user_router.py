@@ -5,6 +5,8 @@ from fastapi import Request, status as st, Depends
 from DataBase.models.dto_models import NewUser, UpdateUserDTO, UserDTO, UpdateUserEmailDTO, UpdateUserPasswordDTO
 from DataBase.models.token_model import TokenData
 from Enums.enums import ResponseCode, LangEnum
+from InternalResponse.base_internal_response import BaseInternalResponses
+from InternalResponse.internal_errors import InternalErrors
 from Routers.base_router import BaseRoutes
 from Schemas.responses.base_response import BaseResponse, BaseContent
 from Services.auth_service import decode_token
@@ -25,19 +27,39 @@ class UserRoutes(BaseRoutes):
         # POST
         self.api_router.add_api_route("/", self.post_user, methods=["POST"])
 
-        # PUT
-        self.api_router.add_api_route("/", self.put_user, methods=["PUT"])
-        self.api_router.add_api_route("/email/{user_email}", self.put_user_email, methods=["PUT"])
-        self.api_router.add_api_route("/password/{user_password}", self.put_user_password, methods=["PUT"])
+        # PATCH
+        self.api_router.add_api_route("/update_user", self.patch_user_details, methods=["PATCH"])
+        self.api_router.add_api_route("/update_email", self.patch_user_email, methods=["PATCH"])
+        self.api_router.add_api_route("/update_password", self.patch_user_password, methods=["PATCH"])
 
         # DELETE
-        self.api_router.add_api_route("/{user_email}", self.delete_user_when_logged, methods=["DELETE"])
+        self.api_router.add_api_route("/", self.delete_user, methods=["DELETE"])
 
     async def get_me(
         self,
         request: Request,
         current_user: Annotated[TokenData, Depends(decode_token)],
     ) -> BaseResponse:
+        """
+        Get self user information
+
+        Examples:
+            curl -X GET \\
+            --url http://localhost:8080/users/me \\
+            --header 'Authorization: Bearer {token}'
+
+            response:
+                {
+                    "rc": 0,
+                    "data": {
+                        "name": str,
+                        "last_update": date_time_utc,
+                        "email": str,
+                        "language": LangEnum,
+                        "birthdate": date
+                    }
+                }
+        """
         self._logger.info("Starting get_me")
         service = self._create_service()
 
@@ -50,22 +72,53 @@ class UserRoutes(BaseRoutes):
             return BaseResponse(status_code=st.HTTP_200_OK, content=content)
 
         except Exception as e:
-            return self.return_exception(e)
+            return self.return_exception(e, logger=self._logger)
 
     async def post_user(
         self, request: Request, new_user: NewUser, language: Optional[LangEnum] = LangEnum.EN_US
     ) -> BaseResponse:
-        service = self._create_service()
+        """
+        Create a new user
+
+        Args:
+            new_user (NewUser): new user data
+            language (Optional[LangEnum]): language. Defaults to LangEnum.EN_US.
+
+        Examples:
+            curl -X POST \\
+            --url http://localhost:8080/users \\
+            --header 'Content-Type: application/json' \\
+            --header 'Authorization: Bearer {token}' \\
+            --data '{\\
+                      "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",\\
+                      "name": "string",\\
+                      "creation": "2024-09-12T03:14:36.820Z",\\
+                      "last_update": "2024-09-12T03:14:36.820Z",\\
+                      "password": "P@s5W0rD",\\
+                      "email": "your.email@domain.com",\\
+                      "language": "PT_BR",\\
+                      "birthdate": "2024-09-12"\\
+                    }'
+
+        """
         self._logger.info("Starting post_user")
 
-        if request.headers.get("Authorization", None) is not None:
-            self._logger.debug("User already logged - Cannot create new user")
+        service = self._create_service()
 
-            content = BaseContent(rc=ResponseCode.ALREADY_LOGGED)
-            return BaseResponse(status_code=st.HTTP_403_FORBIDDEN, content=content)
+        self._logger.debug(f"Checking if user already logged {request.headers}")
+        if request.headers.get("Authorization", None) is not None:
+            self._logger.warning("User already logged - Cannot create new user")
+
+            internal_error: BaseInternalResponses = InternalErrors.FORBIDDEN_403(
+                rc=ResponseCode.ALREADY_LOGGED, language=language
+            )
+
+            content = BaseContent(rc=internal_error.rc, data=internal_error.message)
+            return BaseResponse(status_code=internal_error.status_code, content=content)
 
         try:
-            self._logger.debug("Starting create_user")
+
+            self._logger.debug("Starting user creation")
             user_dto: UserDTO = service.create_user(new_user, language)
 
             self._logger.info("User successfully created")
@@ -73,9 +126,9 @@ class UserRoutes(BaseRoutes):
             return BaseResponse(status_code=st.HTTP_201_CREATED, content=content)
 
         except Exception as e:
-            return self.return_exception(e)
+            return self.return_exception(e, logger=self._logger)
 
-    async def put_user(
+    async def patch_user_details(
         self,
         request: Request,
         current_user: Annotated[TokenData, Depends(decode_token)],
@@ -96,7 +149,7 @@ class UserRoutes(BaseRoutes):
         except Exception as e:
             return self.return_exception(e)
 
-    async def put_user_email(
+    async def patch_user_email(
         self,
         request: Request,
         current_user: Annotated[TokenData, Depends(decode_token)],
@@ -116,7 +169,7 @@ class UserRoutes(BaseRoutes):
         except Exception as e:
             return self.return_exception(e)
 
-    async def put_user_password(
+    async def patch_user_password(
         self,
         request: Request,
         current_user: Annotated[TokenData, Depends(decode_token)],
@@ -136,7 +189,7 @@ class UserRoutes(BaseRoutes):
         except Exception as e:
             return self.return_exception(e)
 
-    async def delete_user_when_logged(
+    async def delete_user(
         self,
         request: Request,
         current_user: Annotated[TokenData, Depends(decode_token)],

@@ -24,6 +24,9 @@ __all__ = [
     "register_routes",
 ]
 
+from Routers.user_router import UserRoutes
+from Routers.utils_router import UtilsRoutes
+
 from Utils.internal_types import METHODS
 
 ### APP CONFIG ###
@@ -123,8 +126,8 @@ def register_middlewares(app: FastAPI) -> None:
 ### ROUTERS ###
 routers: list[type[BaseRoutes]] = [
     AuthRoutes,
-    # UserRoutes,
-    # UtilsRoutes,
+    UserRoutes,
+    UtilsRoutes,
     # UnityTypeRoutes,
     # DefaultCategoryRoutes,
     # DefaultProductsRoutes,
@@ -141,3 +144,6 @@ def register_routes(app: FastAPI) -> None:
 
         logger.debug(f"Starting - {r.__class__.__name__}")
         app.include_router(r.api_router)
+
+        for route in r.api_router.routes:
+            logger.debug(f"Route: {list(route.methods)[0]} - {route.tags[0]} - {route.path}")

@@ -6,7 +6,7 @@ from pydantic import BaseModel
 from sqlalchemy.orm import scoped_session, Session
 
 from DataBase.models.dto_models import NewUser, UpdateUserDTO, UserLoginDTO
-from DataBase.schemas.user_schema import TbUser
+from DataBase.schemas.user_schema import User
 from Enums.enums import LangEnum, ResponseCode
 from InternalResponse.internal_errors import InternalErrors
 from Utils.internal_types import BaseModelWithPassword
@@ -20,6 +20,8 @@ class UserValidator(BaseValidator):
         self._pwd_context = CryptContext(schemes=["bcrypt"])
 
     def validate_new_user(self, db_session: scoped_session[Session], new_user: NewUser, language: LangEnum):
+        self._logger.info("Starting validate_new_user")
+
         self.validate_email(db_session, new_user.email, language)
         self.validate_password(new_user, language)
         self._validate_name(new_user.name, language)
@@ -68,14 +70,17 @@ class UserValidator(BaseValidator):
         model_with_password.password = self._pwd_context.hash(password)
 
     def validate_email(self, db_session: scoped_session[Session], email: str, language: LangEnum) -> None:
+        self._logger.info("Starting validate_email")
+
         try:
-            self._logger.info("Validating email")
-            email_validator.validate_email(email, check_deliverability=False)
+            self._logger.debug("Check if email is valid and deliverable")
+            email_validator.validate_email(email, check_deliverability=True)
+            self._logger.debug("Email is valid and deliverable")
 
             query = self._query.select_user_by_email(email)
 
-            self._logger.debug(f"Checking if email - '{email}' - exists in table - '{TbUser.__tablename__}'")
-            result: TbUser = db_session.execute(query).scalars().first()
+            self._logger.debug(f"Checking if email - '{email}' - exists in table - '{User.__tablename__}'")
+            result: User = db_session.execute(query).scalar()
             self._logger.debug(f"User found - <user: {result}>")
 
             if result is not None:

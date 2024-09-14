@@ -1,3 +1,4 @@
+import logging
 import os
 from typing import Annotated
 
@@ -119,15 +120,24 @@ class AuthService(BaseService):
         return UserValidator()
 
 
+_logger = logging.getLogger(__name__)
+
+
 def decode_token(token: Annotated[Token, Depends(oauth2_scheme)]) -> TokenData:
+    _logger.info("Starting decode_token")
+
     try:
+        _logger.debug("Decoding token")
         payload: dict = jwt.decode(
             jwt=token,
             key=os.getenv("SECRET_KEY"),
             algorithms=[os.getenv("ALGORITHM")],
         )
 
+        _logger.debug(f"Token decoded: {payload}")
         current_user = TokenData.model_validate(payload)
+
+        _logger.debug(f"<current_user: {current_user}>")
 
         if current_user.is_active is False:
             raise InternalErrors.UNAUTHORIZED_401(ResponseCode.INVALID_CREDENTIALS, LangEnum.EN_US)

@@ -8,6 +8,8 @@ from Utils.global_functions import datetime_now_utc
 
 reg = registry()
 
+reg.configure(cascade=True)
+
 
 class BaseSchema(DeclarativeBase):
     __abstract__ = True

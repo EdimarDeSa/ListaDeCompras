@@ -40,7 +40,7 @@ class UpdateUserDTO(BaseModel):
     name: Optional[str] = None
     language: Optional[LangEnum] = None
     birthdate: Optional[date] = None
-    last_update: datetime = Field(default_factory=datetime_now_utc, exclude=True)
+    last_update: Optional[datetime] = Field(default_factory=datetime_now_utc, exclude=True)
 
 
 class UpdateUserEmailDTO(BaseModel):
@@ -75,26 +75,22 @@ class MarketDTO(BaseUserPropertyDTO):
 class UserCategoryDTO(BaseUserPropertyDTO):
     pass
 
-    def get_id_by_name(self, name: str) -> uuid.UUID:
-        if name == self.name:
-            return self.id
-
 
 class NewUserCategory(BaseUserPropertyDTO):
     pass
 
 
-class UserProductsDTO(BaseUserPropertyDTO):
+class UserProductDTO(BaseUserPropertyDTO):
     unity_types_id: uuid.UUID
     price: float = 0.0
     price_unity_types_id: uuid.UUID
     category_id: uuid.UUID
-    notes: str
-    barcode: str
-    image_url: str
+    notes: Optional[str] = None
+    barcode: Optional[str] = None
+    image_url: Optional[str] = None
 
 
-class NewUserProduct(UserProductsDTO):
+class NewUserProduct(UserProductDTO):
     pass
 
 

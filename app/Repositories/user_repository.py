@@ -4,7 +4,7 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session, scoped_session
 
 from DataBase.models.dto_models import UserDTO, NewUser, UpdateUserDTO, UserLoginDTO
-from DataBase.schemas.user_schema import TbUser
+from DataBase.schemas.user_schema import User
 from Enums.enums import LangEnum, ResponseCode
 from InternalResponse.internal_errors import InternalErrors
 from Repositories.base_repository import BaseRepository
@@ -17,10 +17,10 @@ class UserRepository(BaseRepository):
 
     def read_by_id(self, db_session: scoped_session[Session], user_id: UUID, language: LangEnum) -> UserDTO:
         try:
-            self._logger.debug(f"Searching user with id - '{user_id}' - in table - '{TbUser.__tablename__}'")
+            self._logger.debug(f"Searching user with id - '{user_id}' - in table - '{User.__tablename__}'")
             query = self._query.select_user_by_id(user_id)
 
-            result: TbUser = db_session.execute(query).scalars().first()  # type: ignore
+            result: User = db_session.execute(query).scalars().first()  # type: ignore
             self._logger.debug(f"User found - <result: {result}>")
 
             if result is None:
@@ -42,10 +42,10 @@ class UserRepository(BaseRepository):
         self._logger.info("Starting read_by_email")
 
         try:
-            self._logger.debug(f"Searching user with <Email: {user_email}> - in table - '{TbUser.__tablename__}'")
+            self._logger.debug(f"Searching user with <Email: {user_email}> - in table - '{User.__tablename__}'")
             query = self._query.select_user_by_email(user_email)
 
-            result: TbUser = db_session.execute(query).scalars().first()
+            result: User = db_session.execute(query).scalar()
             self._logger.debug(f"User found - {result}")
 
             if result is None:
@@ -67,14 +67,20 @@ class UserRepository(BaseRepository):
     def create_user(self, db_session: scoped_session[Session], new_user: NewUser, language: LangEnum) -> UserDTO:
         try:
             self._logger.info("Creating new user")
-            user_data = new_user.model_dump(exclude_none=True)
+            user_data: dict = new_user.model_dump(exclude_none=True)
             query = self._query.insert_user(user_data)
 
-            db_session.execute(query)
+            result = db_session.execute(query)
             db_session.flush()
 
+            self._logger.debug(f"User created: {result.inserted_primary_key}")
+
+            self._logger.debug("Retrieving user created")
+            query = self._query.select_user_by_id(result.inserted_primary_key[0])
+            result_2 = db_session.execute(query).scalar()
+
             self._logger.info("User created")
-            return UserDTO.model_validate(new_user)
+            return UserDTO.model_validate(result_2, from_attributes=True)
 
         except Exception as e:
             self.return_db_error(e, language)

@@ -2,17 +2,12 @@ from uuid import UUID
 
 from sqlalchemy.orm import scoped_session, Session
 
-from DataBase.connection_handler import DBConnectionHandler, get_db_url
-from DataBase.models.defualt_product_models import DefaultProductDTO
 from DataBase.models.dto_models import (
     UserDTO,
     NewUser,
     UpdateUserDTO,
-    DefaultCategoryDTO,
     UpdateUserEmailDTO,
     UpdateUserPasswordDTO,
-    NewUserCategory,
-    UserCategoryDTO,
 )
 from Enums.enums import LangEnum
 from Repositories.default_category_repository import DefaultCategoryRepository
@@ -35,7 +30,7 @@ class UserService(BaseService):
         self._logger = self.create_logger(__name__)
 
     def read_by_id(self, user_id: UUID, language: LangEnum) -> UserDTO:
-        db_session = self._create_db_session()
+        db_session = self.create_db_session()
 
         try:
             self._logger.debug(f"Searching for user_id - {user_id}")
@@ -51,10 +46,12 @@ class UserService(BaseService):
             db_session.close()
 
     def create_user(self, new_user: NewUser, language: LangEnum) -> UserDTO:
-        db_session = self._create_db_session()
+        self._logger.info(f"Starting create_user")
+
+        db_session = self.create_db_session()
 
         try:
-            self._logger.debug(f"Creating new user: {new_user.email}")
+            self._logger.debug(f"Validating new user data")
             self._validator.validate_new_user(db_session, new_user, language)
 
             self._logger.debug(f"Saving new user: {new_user.email}")
@@ -78,7 +75,7 @@ class UserService(BaseService):
             db_session.close()
 
     def update_user(self, user_id: UUID, update_data: UpdateUserDTO, language: LangEnum) -> UpdateUserDTO:
-        db_session = self._create_db_session()
+        db_session = self.create_db_session()
 
         try:
             self._logger.debug(f"Validating updates")
@@ -100,7 +97,7 @@ class UserService(BaseService):
             db_session.close()
 
     def update_user_email(self, user_id: UUID, new_email: UpdateUserEmailDTO, language: LangEnum) -> None:
-        db_session = self._create_db_session()
+        db_session = self.create_db_session()
 
         try:
             self._logger.debug(f"Validating updates")
@@ -121,7 +118,7 @@ class UserService(BaseService):
             db_session.close()
 
     def update_user_password(self, user_id: UUID, new_password: UpdateUserPasswordDTO, language: LangEnum) -> None:
-        db_session = self._create_db_session()
+        db_session = self.create_db_session()
 
         try:
             self._logger.debug(f"Validating updates")
@@ -141,7 +138,8 @@ class UserService(BaseService):
             db_session.close()
 
     def delete_user_by_id(self, user_id: UUID, language: LangEnum) -> None:
-        db_session = self._create_db_session()
+        self._logger.info(f"Starting delete_user_by_id")
+        db_session = self.create_db_session()
 
         try:
             self._logger.debug(f"Deleting user: {user_id}")
@@ -159,34 +157,13 @@ class UserService(BaseService):
             db_session.close()
 
     def activate_user(self, db_session: scoped_session[Session], user_id: UUID, language: LangEnum) -> None:
-        # TODO: Finalizar regra de negócio
         self._logger.info(f"Activating user: {user_id}")
 
-        self._logger.debug("Selecting all default categories")
-        default_categories: list[DefaultCategoryDTO] = self._def_cat_repository.select_all(db_session, language)
-
         self._logger.debug("Creating user categories")
-        new_categories = [NewUserCategory(name=c.name, user_id=user_id) for c in default_categories]
-
-        self._logger.debug(f"Created <Categories: {new_categories}>")
-        self._user_cat_repository.create_default_user_categories(db_session, new_categories, language)
-
-        self._logger.debug("Selecting all user categories")
-        user_categories: list[UserCategoryDTO] = self._user_cat_repository.get_all_user_categories_by_user_id(
-            db_session, user_id, language
-        )
-        self._logger.debug("User categories selected")
-
-        self._logger.debug("Selecting all default products")
-        default_products: list[DefaultProductDTO] = self._def_prod_repository.get_all_default_products(
-            db_session, language
-        )
-        self._logger.debug("Default products selected")
+        self._user_cat_repository.create_default_user_categories(db_session, user_id, language)
 
         self._logger.debug("Creating user products")
-        self._user_prod_repository.create_default_user_products(
-            db_session, user_id, default_products, user_categories, language
-        )
+        self._user_prod_repository.create_default_user_products(db_session, user_id, language)
         self._logger.debug("User products created")
 
         self._logger.info(f"User activated: {user_id}")
@@ -196,6 +173,3 @@ class UserService(BaseService):
 
     def _create_validator(self) -> UserValidator:
         return UserValidator()
-
-    def _create_db_session(self) -> scoped_session[Session]:
-        return DBConnectionHandler.create_session(db_url=get_db_url())

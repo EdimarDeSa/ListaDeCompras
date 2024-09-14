@@ -26,6 +26,7 @@ class BaseRoutes(ABC):
 
     def return_exception(self, e: Exception, logger: logging.Logger = None, **kwargs) -> BaseResponse:
         if logger is not None:
+            logger.info("Starting return_exception")
             logger.exception(e)
 
         if isinstance(e, BaseInternalResponses):

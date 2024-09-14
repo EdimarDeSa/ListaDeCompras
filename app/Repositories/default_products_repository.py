@@ -70,7 +70,7 @@ class DefaultProductsRepository(BaseRepository):
 
         self._logger.debug(f"Searching for unity type where name = {new_product.unit_type_name}")
         query = self._query.select_unity_type_by_name(new_product.unit_type_name)
-        unity_type_result: UnityType = db_session.execute(query).scalars().first()
+        unity_type_result: UnityType = db_session.execute(query).scalar()
         cleaned_data["unit_type_id"] = unity_type_result.id
 
         self._logger.debug(f"Searching for default category where name = {new_product.default_category_name}")

@@ -1,14 +1,15 @@
 import uuid
 
-from sqlalchemy import Select, Update, Insert, TextClause
+from sqlalchemy import Select, Update, Insert, TextClause, Delete, delete
 from sqlalchemy import select, update, insert, text
 
 from DataBase.models.defualt_product_models import DefaultProductDTO
 from DataBase.schemas.default_category_schema import DefaultCategory
 from DataBase.schemas.default_product_schema import DefaultProduct
 from DataBase.schemas.unity_type_schema import UnityType
-from DataBase.schemas.user_categories_schema import UserCategories
-from DataBase.schemas.user_schema import TbUser
+from DataBase.schemas.user_categories_schema import UserCategory
+from DataBase.schemas.user_products_schema import UserProduct
+from DataBase.schemas.user_schema import User
 
 
 class Query:
@@ -19,20 +20,20 @@ class Query:
         return text("SELECT 1")
 
     ### USER TABLE ###
-    def select_user_by_id(self, user_id: uuid.UUID) -> Select[TbUser]:
-        return select(TbUser).where(TbUser.id == user_id)
+    def select_user_by_id(self, user_id: uuid.UUID) -> Select[User]:
+        return select(User).where(User.id == user_id)
 
-    def select_user_by_email(self, email: str) -> Select[TbUser]:
-        return select(TbUser).where(TbUser.email == email)
+    def select_user_by_email(self, email: str) -> Select[User]:
+        return select(User).where(User.email == email)
 
-    def delete_user_by_id(self, user_id: uuid.UUID) -> Update[TbUser]:
-        return update(TbUser).where(TbUser.id == user_id).values(is_active=False)
+    def delete_user_by_id(self, user_id: uuid.UUID) -> Delete[User]:
+        return delete(User).where(User.id == user_id)
 
-    def update_user_by_id(self, user_id: uuid.UUID, **kwargs: dict) -> Update[TbUser]:
-        return update(TbUser).where(TbUser.id == user_id).values(**kwargs)
+    def update_user_by_id(self, user_id: uuid.UUID, **kwargs: dict) -> Update[User]:
+        return update(User).where(User.id == user_id).values(**kwargs)
 
-    def insert_user(self, **kwargs: dict) -> Insert[TbUser]:
-        return insert(TbUser).values(**kwargs)
+    def insert_user(self, user_data: dict) -> Insert[User]:
+        return insert(User).values(user_data)
 
     ### UNITY TYPE TABLE ###
     def select_all_unity_types(self) -> Select[tuple[UnityType]]:
@@ -59,8 +60,20 @@ class Query:
         return insert(DefaultProduct).values(**kwargs)
 
     ### USER CATEGORIES TABLE ###
-    def insert_user_categories(self, values: list[dict]) -> Insert[UserCategories]:
-        return insert(UserCategories).values(values)
+    def select_all_user_categories(self, user_id: uuid.UUID) -> Select[tuple[UserCategory]]:
+        return select(UserCategory).where(UserCategory.user_id == user_id)
 
-    def select_all_user_categories(self, user_id: uuid.UUID) -> Select[tuple[UserCategories]]:
-        return select(UserCategories).where(UserCategories.user_id == user_id)
+    def select_user_categories_by_ids(self, inserted_ids: list[uuid.UUID]) -> Select[tuple[UserCategory]]:
+        return select(UserCategory).where(UserCategory.id.in_(inserted_ids))
+
+    def insert_user_product(self, user_products_data: dict) -> Insert[UserProduct]:
+        return insert(UserProduct).values(user_products_data)
+
+    def select_all_default_categories_names(self) -> Select[tuple[DefaultCategory.name]]:
+        return select(DefaultCategory.name).order_by(DefaultCategory.name)
+
+    def insert_user_category(self, user_cat_data: dict) -> Insert[UserCategory]:
+        return insert(UserCategory).values(user_cat_data)
+
+    def select_user_category_id_by_name(self, user_id: uuid.UUID, name: str) -> Select[UserCategory.id]:
+        return select(UserCategory.id).where(UserCategory.user_id == user_id and UserCategory.name == name)
