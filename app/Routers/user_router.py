@@ -134,6 +134,27 @@ class UserRoutes(BaseRoutes):
         current_user: Annotated[TokenData, Depends(decode_token)],
         update_data: UpdateUserDTO,
     ) -> BaseResponse:
+        """
+        Update some user data
+
+        Args:
+
+            update_data (UpdateUserDTO): Object with new user data
+
+        Examples:
+
+            curl -X PATCH \\
+            --url http://localhost:8080/users/update_user \\
+            --header 'Content-Type: application/json' \\
+            --header 'Authorization: Bearer {token}' \\
+            --data '{\\
+                      "name": string,\\
+                      "email": string,\\
+                      "language": LangEnum,\\
+                      "birthdate": date\\
+                    }'
+
+        """
         service = self._create_service()
         self._logger.info("Starting put_user")
 
@@ -155,6 +176,24 @@ class UserRoutes(BaseRoutes):
         current_user: Annotated[TokenData, Depends(decode_token)],
         new_email: UpdateUserEmailDTO,
     ) -> BaseResponse:
+        """
+        Update user email
+
+        Args:
+
+            new_email (UpdateUserEmailDTO): New user email
+
+        Examples:
+
+            curl -X PATCH \\
+            --url http://localhost:8080/users/update_user_email \\
+            --header 'Content-Type: application/json' \\
+            --header 'Authorization: Bearer {token}' \\
+            --data '{\\
+                      "email": string\\
+                    }'
+
+        """
         service = self._create_service()
         self._logger.info("Starting put_user_email")
 
@@ -175,6 +214,24 @@ class UserRoutes(BaseRoutes):
         current_user: Annotated[TokenData, Depends(decode_token)],
         new_password: UpdateUserPasswordDTO,
     ) -> BaseResponse:
+        """
+        Update user password
+
+        Args:
+
+            new_password: New password
+
+        Examples:
+
+            curl -X PATCH \\
+            --url http://localhost:8080/users/update_password \\
+            --header 'Content-Type: application/json' \\
+            --header 'Authorization: Bearer {token}' \\
+            --data '{\\
+                      "password": string\\
+                    }'
+
+        """
         service = self._create_service()
         self._logger.info("Starting put_user_password")
 

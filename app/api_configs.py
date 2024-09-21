@@ -24,6 +24,8 @@ __all__ = [
     "register_routes",
 ]
 
+from Routers.unity_type_router import UnityTypeRoutes
+
 from Routers.user_router import UserRoutes
 from Routers.utils_router import UtilsRoutes
 
@@ -128,7 +130,7 @@ routers: list[type[BaseRoutes]] = [
     AuthRoutes,
     UserRoutes,
     UtilsRoutes,
-    # UnityTypeRoutes,
+    UnityTypeRoutes,
     # DefaultCategoryRoutes,
     # DefaultProductsRoutes,
 ]

@@ -20,7 +20,7 @@ class UnityTypeService(BaseService):
         try:
             self._logger.debug("Trying to get all unity types")
             unity_types: list[UnityTypeDTO] = self._repository.read_all(db_session, language)
-            self._logger.info(f"Unity types found: {unity_types}")
+            self._logger.info(f"Unity types found: {len(unity_types)}")
             return unity_types
 
         except Exception as e:
