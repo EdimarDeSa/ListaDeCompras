@@ -50,7 +50,7 @@ class DefaultProductsRoutes(BaseRoutes):
         service = self._create_service()
         self._logger.info("Starting post_new_default_product")
 
-        # TODO: Implementar verificação de perfil
+        # FUTURE: Implementar verificação de perfil
         # if current_user.perfil.name != UserProfileEnum.ADMIN:
         #     raise InternalErrors.FORBIDDEN_403(ResponseCode.FORBIDDEN_ADMIN_ACCESS, language)
 
