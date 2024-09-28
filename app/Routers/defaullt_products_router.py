@@ -1,13 +1,12 @@
 from typing import Annotated
 
-from fastapi import Request, Depends
-from fastapi import status as st
-
-from DataBase.models.defualt_product_models import NewDefaultProduct, DefaultProductDTO
+from DataBase.models.defualt_product_models import DefaultProductDTO, NewDefaultProduct
 from DataBase.models.token_model import TokenData
 from Enums.enums import LangEnum
+from fastapi import Depends, Request
+from fastapi import status as st
 from Routers.base_router import BaseRoutes
-from Schemas.responses.base_response import BaseResponse, BaseContent
+from Schemas.responses.base_response import BaseContent, BaseResponse
 from Services.auth_service import decode_token
 from Services.default_products_service import DefaultProductsService
 
