@@ -1,12 +1,12 @@
-from Models.models import User
-from faker import Faker
-from fastapi.testclient import TestClient
-from pytest import fixture
-
 from DataBase.connection_handler import DBConnectionHandler, get_db_url
 from DataBase.models.dto_models import UserDTO
 from Enums.enums import LangEnum
-from main import app
+from faker import Faker
+from fastapi.testclient import TestClient
+from Models.models import User
+from pytest import fixture
+
+from app.main import app
 
 
 @fixture(scope="module")
