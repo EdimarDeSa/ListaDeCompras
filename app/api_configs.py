@@ -8,7 +8,11 @@ from InternalResponse.internal_errors import InternalErrors
 from Middlewares.process_time import add_process_time_header
 from Routers.auth_router import AuthRoutes
 from Routers.base_router import BaseRoutes
+from Routers.unity_type_router import UnityTypeRoutes
+from Routers.user_router import UserRoutes
+from Routers.utils_router import UtilsRoutes
 from starlette.middleware.cors import CORSMiddleware
+from Utils.internal_types import METHODS
 
 __all__ = [
     "TITLE",
@@ -22,11 +26,6 @@ __all__ = [
     "register_middlewares",
     "register_routes",
 ]
-
-from Routers.unity_type_router import UnityTypeRoutes
-from Routers.user_router import UserRoutes
-from Routers.utils_router import UtilsRoutes
-from Utils.internal_types import METHODS
 
 ### APP CONFIG ###
 

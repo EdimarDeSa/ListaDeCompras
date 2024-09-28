@@ -1,26 +1,25 @@
 [tool.poetry]
-name = "simplesproject"
+name = "listadecompras"
 version = "0.1.0"
-description = "MIT"
+description = ""
 authors = ["Edimar Sá <edimar.sa@efscode.com.br>"]
 license = "MIT"
-package-mode = false
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.11"
 fastapi = { extras = ["standard"], version = "^0.112.0" }
 SQLAlchemy = "^2.0.32"
 python-dotenv = "^1.0.1"
 pydantic = "^2.8.2"
 uvicorn = "^0.30.6"
-psycopg2 = "^2.9.9"
 email-validator = "^2.2.0"
 python-multipart = "^0.0.9"
 pyjwt = "^2.9.0"
 passlib = {extras = ["bcrypt"], version = "^1.7.4"}
 bcrypt = "^4.2.0"
+psycopg2-binary = "^2.9.9"
 
-[tool.poetry.group.dev.dependencies]
+[tool.poetry.dev-dependencies]
 faker = "^27.0.0"
 pytest = "^8.3.2"
 mypy = "^1.11.1"
@@ -31,7 +30,6 @@ black = "^24.8.0"
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
-
 [tool.black]
 line-length = 120
 
@@ -40,9 +38,29 @@ profile = "black"
 line_length = 120
 
 [tool.mypy]
-python_version = 3.12
-warn_return_any = true
-warn_unused_configs = true
-warn_redundant_casts = true
-ignore_missing_imports = true
-show_absolute_path = true
+# Tornar a checagem mais rigorosa
+strict = true
+
+# # Exigir tipagem explícita de funções e métodos
+# disallow_untyped_defs = true
+
+# # Exigir tipagem de argumentos em funções lambdas
+# disallow_incomplete_defs = true
+
+# # Proibir o uso de Any explícito
+# # disallow_any_expr = true
+# # disallow_any_explicit = true
+
+# # Exigir declarações de tipo em todas as variáveis locais
+# warn_unused_ignores = true
+# warn_return_any = true
+# warn_no_return = true
+
+# # Mostrar erros em funções de terceiros que não estão tipadas
+# follow_imports = "skip"
+
+# # Ativar checagem de atributos não inicializados
+# check_untyped_defs = true
+
+# # Alertar sobre possíveis tipos None onde não esperado
+# strict_optional = true
