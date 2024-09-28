@@ -4,12 +4,11 @@ import sys
 from logging.handlers import RotatingFileHandler
 
 from fastapi import FastAPI
-from starlette.middleware.cors import CORSMiddleware
-
 from InternalResponse.internal_errors import InternalErrors
 from Middlewares.process_time import add_process_time_header
 from Routers.auth_router import AuthRoutes
 from Routers.base_router import BaseRoutes
+from starlette.middleware.cors import CORSMiddleware
 
 __all__ = [
     "TITLE",
@@ -25,10 +24,8 @@ __all__ = [
 ]
 
 from Routers.unity_type_router import UnityTypeRoutes
-
 from Routers.user_router import UserRoutes
 from Routers.utils_router import UtilsRoutes
-
 from Utils.internal_types import METHODS
 
 ### APP CONFIG ###
@@ -77,16 +74,17 @@ if DEBUG_MODE:
         "%(asctime)s [%(processName)s: %(process)d] [%(threadName)s: %(thread)d] [%(levelname)s] %(name)s: %(message)s"
     )
 
-    console_handler = logging.StreamHandler(stream=sys.stdout)
+    console_handler = logging.StreamHandler()
 
     log_file = os.getenv("LOG_FILE", "app.log")
-    rotating_handler = RotatingFileHandler(log_file, maxBytes=2000, backupCount=5)
+
+    # rotating_handler = RotatingFileHandler(log_file, maxBytes=2000, backupCount=5)
 
     logging.basicConfig(
         level=logging.DEBUG,
         format=log_format,
         encoding="utf-8",
-        handlers=[console_handler, rotating_handler],
+        stream=sys.stdout,
         datefmt="%Y-%m-%d %H:%M:%S",
     )
 
