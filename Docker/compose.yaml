@@ -2,15 +2,20 @@ services:
   postgres:
     image: postgres:16
     env_file:
-      - .env
+      - ../.env
     ports:
       - "5432:5432"
     restart: always
-    network_mode: bridge
     volumes:
       - db_data:/var/lib/postgresql/data
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
-
+      - ./init_data/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - db_network
+    shm_size: 128mb
 
 volumes:
   db_data:
+
+networks:
+  db_network:
+    driver: bridge
