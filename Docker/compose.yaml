@@ -5,7 +5,6 @@ services:
       - ../.env
     ports:
       - "5432:5432"
-    restart: always
     volumes:
       - db_data:/var/lib/postgresql/data
       - ./init_data/init.sql:/docker-entrypoint-initdb.d/init.sql
