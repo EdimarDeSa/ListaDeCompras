@@ -1,10 +1,9 @@
-from sqlalchemy.orm import scoped_session, Session
-
 from DataBase.connection_handler import DBConnectionHandler, get_db_url
 from DataBase.models.defualt_product_models import DefaultProductDTO, NewDefaultProduct
 from Enums.enums import LangEnum
 from Repositories.default_products_repository import DefaultProductsRepository
 from Services.base_service import BaseService
+from sqlalchemy.orm import Session, scoped_session
 from Validators.default_product_validator import DefaultProductValidator
 
 
